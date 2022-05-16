@@ -1,17 +1,7 @@
-## My Project
+## AWS Cloudformation Resource Providers for AWS EMRServerless Applications
 
-TODO: Fill this README out!
-
-Be sure to:
-
-* Change the title in this README
-* Edit your repository description on GitHub
-
-## Security
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+The CloudFormation Resource Provider Package For AWS EMRServerless Applications
 
 ## License
 
 This project is licensed under the Apache-2.0 License.
-
