@@ -12,6 +12,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "Type" : "AWS::EMRServerless::Application",
     "Properties" : {
+        "<a href="#architecture" title="Architecture">Architecture</a>" : <i>String</i>,
         "<a href="#name" title="Name">Name</a>" : <i>String</i>,
         "<a href="#releaselabel" title="ReleaseLabel">ReleaseLabel</a>" : <i>String</i>,
         "<a href="#type" title="Type">Type</a>" : <i>String</i>,
@@ -30,6 +31,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 Type: AWS::EMRServerless::Application
 Properties:
+    <a href="#architecture" title="Architecture">Architecture</a>: <i>String</i>
     <a href="#name" title="Name">Name</a>: <i>String</i>
     <a href="#releaselabel" title="ReleaseLabel">ReleaseLabel</a>: <i>String</i>
     <a href="#type" title="Type">Type</a>: <i>String</i>
@@ -44,6 +46,18 @@ Properties:
 </pre>
 
 ## Properties
+
+#### Architecture
+
+The cpu architecture of an application.
+
+_Required_: No
+
+_Type_: String
+
+_Allowed Values_: <code>ARM64</code> | <code>X86_64</code>
+
+_Update requires_: [Some interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-some-interrupt)
 
 #### Name
 
@@ -160,3 +174,4 @@ The Amazon Resource Name (ARN) of the EMR Serverless Application.
 #### ApplicationId
 
 The ID of the EMR Serverless Application.
+

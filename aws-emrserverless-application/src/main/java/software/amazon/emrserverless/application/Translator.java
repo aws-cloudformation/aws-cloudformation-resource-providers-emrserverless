@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.services.emrserverless.model.Application;
 import software.amazon.awssdk.services.emrserverless.model.ApplicationState;
+import software.amazon.awssdk.services.emrserverless.model.Architecture;
 import software.amazon.awssdk.services.emrserverless.model.ConflictException;
 import software.amazon.awssdk.services.emrserverless.model.CreateApplicationRequest;
 import software.amazon.awssdk.services.emrserverless.model.DeleteApplicationRequest;
@@ -179,6 +180,7 @@ public class Translator {
                 .autoStopConfiguration(translate(application.autoStopConfiguration()))
                 .networkConfiguration(translate(application.networkConfiguration()))
                 .tags(TagHelper.convertToSet(application.tags()))
+                .architecture(application.architectureAsString())
                 .build())
             .orElse(null);
     }
@@ -363,7 +365,14 @@ public class Translator {
             .maximumCapacity(translate(model.getMaximumCapacity()))
             .networkConfiguration(translate(model.getNetworkConfiguration()))
             .tags(TagHelper.generateTagsForCreate(model, request))
+            .architecture(translate(model.getArchitecture()))
             .build();
+    }
+
+    private static Architecture translate(String architecture) {
+        return architecture == null
+                ? null
+                : Architecture.valueOf(architecture);
     }
 
     /**
@@ -419,6 +428,7 @@ public class Translator {
             .initialCapacity(translate(model.getInitialCapacity()))
             .maximumCapacity(translate(model.getMaximumCapacity()))
             .networkConfiguration(translate(model.getNetworkConfiguration()))
+            .architecture(translate(model.getArchitecture()))
             .build();
     }
 

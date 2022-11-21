@@ -95,6 +95,7 @@ public abstract class AbstractTestBase {
     protected static final AwsServiceException GENERIC_SERVICE_EXCEPTION = AwsServiceException.builder()
         .message("generic service exception")
         .build();
+    protected static final String ARCHITECTURE = "X86_64";
 
     static {
         MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
@@ -127,6 +128,7 @@ public abstract class AbstractTestBase {
             .name(APPLICATION_NAME)
             .type(APPLICATION_TYPE)
             .releaseLabel(RELEASE_LABEL)
+            .architecture(ARCHITECTURE)
             .autoStartConfiguration(AutoStartConfig.builder()
                 .enabled(AUTO_START_ENABLED)
                 .build())
@@ -199,6 +201,7 @@ public abstract class AbstractTestBase {
             .type(APPLICATION_TYPE)
             .arn(APPLICATION_ARN)
             .releaseLabel(RELEASE_LABEL)
+            .architecture(ARCHITECTURE)
             .autoStartConfiguration(AutoStartConfiguration.builder()
                 .enabled(AUTO_START_ENABLED)
                 .build())
