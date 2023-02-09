@@ -8,9 +8,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import software.amazon.awssdk.awscore.AwsRequest;
+
+import com.google.common.collect.Sets;
+
 import software.amazon.awssdk.services.emrserverless.model.Application;
 import software.amazon.awssdk.services.emrserverless.model.ApplicationState;
 import software.amazon.awssdk.services.emrserverless.model.Architecture;
@@ -20,6 +21,8 @@ import software.amazon.awssdk.services.emrserverless.model.DeleteApplicationRequ
 import software.amazon.awssdk.services.emrserverless.model.EmrServerlessException;
 import software.amazon.awssdk.services.emrserverless.model.GetApplicationRequest;
 import software.amazon.awssdk.services.emrserverless.model.GetApplicationResponse;
+import software.amazon.awssdk.services.emrserverless.model.ImageConfiguration;
+import software.amazon.awssdk.services.emrserverless.model.ImageConfigurationInput;
 import software.amazon.awssdk.services.emrserverless.model.InternalServerException;
 import software.amazon.awssdk.services.emrserverless.model.ListApplicationsRequest;
 import software.amazon.awssdk.services.emrserverless.model.ListApplicationsResponse;
@@ -29,6 +32,8 @@ import software.amazon.awssdk.services.emrserverless.model.TagResourceRequest;
 import software.amazon.awssdk.services.emrserverless.model.UntagResourceRequest;
 import software.amazon.awssdk.services.emrserverless.model.UpdateApplicationRequest;
 import software.amazon.awssdk.services.emrserverless.model.ValidationException;
+import software.amazon.awssdk.services.emrserverless.model.WorkerTypeSpecification;
+import software.amazon.awssdk.services.emrserverless.model.WorkerTypeSpecificationInput;
 import software.amazon.cloudformation.exceptions.BaseHandlerException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
@@ -37,7 +42,6 @@ import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
 import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
-
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 /**
@@ -58,8 +62,10 @@ public class Translator {
     static Map<String, software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig> translate(
         final Set<InitialCapacityConfigKeyValuePair> initialCapacityConfigs) {
         return streamOfOrEmpty(initialCapacityConfigs)
-            .collect(Collectors.toMap(entry -> entry.getKey(),
-                entry -> translate(entry.getValue())));
+            .collect(Collectors.toMap(
+                InitialCapacityConfigKeyValuePair::getKey,
+                entry -> translate(entry.getValue())
+            ));
     }
 
     /**
@@ -72,8 +78,7 @@ public class Translator {
         final InitialCapacityConfig initialCapacityConfig) {
         return Optional.ofNullable(initialCapacityConfig)
             .map(config -> software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig.builder()
-                .workerCount(Optional.ofNullable(config.getWorkerCount())
-                    .orElse(null))
+                .workerCount(config.getWorkerCount())
                 .workerConfiguration(translate(config.getWorkerConfiguration()))
                 .build())
             .orElse(null);
@@ -181,8 +186,34 @@ public class Translator {
                 .networkConfiguration(translate(application.networkConfiguration()))
                 .tags(TagHelper.convertToSet(application.tags()))
                 .architecture(application.architectureAsString())
+                .imageConfiguration(translate(application.imageConfiguration()))
+                .workerTypeSpecifications(translateToRead(application.workerTypeSpecifications()))
                 .build())
             .orElse(null);
+    }
+
+    private static Map<String, software.amazon.emrserverless.application.WorkerTypeSpecificationInput> translateToRead(
+        Map<String, WorkerTypeSpecification> stringWorkerTypeSpecificationMap) {
+
+        if (stringWorkerTypeSpecificationMap == null) {
+            return null;
+        }
+
+        return stringWorkerTypeSpecificationMap.entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> software.amazon.emrserverless.application.WorkerTypeSpecificationInput.builder()
+                    .imageConfiguration(translate(entry.getValue().imageConfiguration()))
+                    .build()));
+    }
+
+    private static software.amazon.emrserverless.application.ImageConfigurationInput translate(ImageConfiguration imageConfiguration) {
+        return imageConfiguration == null
+            ? null
+            : software.amazon.emrserverless.application.ImageConfigurationInput.builder()
+            .imageUri(imageConfiguration.imageUri())
+            .build();
     }
 
     /**
@@ -215,8 +246,7 @@ public class Translator {
         final software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig initialCapacityConfig) {
         return Optional.ofNullable(initialCapacityConfig)
             .map(config -> InitialCapacityConfig.builder()
-                .workerCount(Optional.ofNullable(config.workerCount())
-                    .orElse(null))
+                .workerCount(config.workerCount())
                 .workerConfiguration(translate(config.workerConfiguration()))
                 .build())
             .orElse(null);
@@ -309,12 +339,14 @@ public class Translator {
 
     /**
      * Translate emr-serverless exceptions to cloud-formation handler exceptions.
-     * @param exception Emr-serverless exception
-     * @param operation Operation for which the exception is thrown.
+     *
+     * @param exception  Emr-serverless exception
+     * @param operation  Operation for which the exception is thrown.
      * @param resourceId Resource identifier for which the operation is invoked.
      * @return Translated cfn handler exception
      */
-    static BaseHandlerException translate(final EmrServerlessException exception, final String operation, final String resourceId, final CallbackContext callbackContext) {
+    static BaseHandlerException translate(final EmrServerlessException exception, final String operation, final String resourceId,
+                                          final CallbackContext callbackContext) {
         return Optional.ofNullable(exception)
             .map(e -> {
                 if (e instanceof ValidationException) {
@@ -323,9 +355,9 @@ public class Translator {
                     return StringUtils.isEmpty(resourceId)
                         ? new CfnNotFoundException(e)
                         : new CfnNotFoundException(ResourceModel.TYPE_NAME, resourceId);
-                } else if (e instanceof InternalServerException && callbackContext.isStabilizationFailed()){
+                } else if (e instanceof InternalServerException && callbackContext.isStabilizationFailed()) {
                     return new CfnNotStabilizedException(ResourceModel.TYPE_NAME, resourceId, e);
-                } else if (e instanceof InternalServerException){
+                } else if (e instanceof InternalServerException) {
                     return new CfnServiceInternalErrorException(operation, e);
                 } else if (e instanceof ServiceQuotaExceededException) {
                     return new CfnServiceLimitExceededException(ResourceModel.TYPE_NAME, e.getMessage(), e);
@@ -366,13 +398,40 @@ public class Translator {
             .networkConfiguration(translate(model.getNetworkConfiguration()))
             .tags(TagHelper.generateTagsForCreate(model, request))
             .architecture(translate(model.getArchitecture()))
+            .imageConfiguration(translate(model.getImageConfiguration()))
+            .workerTypeSpecifications(translateToWorkerTypeSpecMap(model.getWorkerTypeSpecifications()))
             .build();
     }
 
     private static Architecture translate(String architecture) {
         return architecture == null
-                ? null
-                : Architecture.valueOf(architecture);
+            ? null
+            : Architecture.valueOf(architecture);
+    }
+
+    private static Map<String, WorkerTypeSpecificationInput> translateToWorkerTypeSpecMap(
+        Map<String, software.amazon.emrserverless.application.WorkerTypeSpecificationInput> workerTypeSpecifications) {
+
+        if (workerTypeSpecifications == null) {
+            return null;
+        }
+
+        return workerTypeSpecifications.entrySet()
+            .stream()
+            .collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> WorkerTypeSpecificationInput.builder()
+                    .imageConfiguration(translate(entry.getValue().getImageConfiguration()))
+                    .build()
+            ));
+    }
+
+    private static ImageConfigurationInput translate(software.amazon.emrserverless.application.ImageConfigurationInput imageConfiguration) {
+        return imageConfiguration == null
+            ? null
+            : ImageConfigurationInput.builder()
+            .imageUri(imageConfiguration.getImageUri())
+            .build();
     }
 
     /**
@@ -415,11 +474,12 @@ public class Translator {
     /**
      * Request to update properties of a previously created resource.
      *
-     * @param model resource model
+     * @param model   resource model
      * @param request request
      * @return UpdateApplicationRequest the aws service request to create a resource
      */
-    static UpdateApplicationRequest translateToUpdateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request) {
+    static UpdateApplicationRequest translateToUpdateRequest(final ResourceModel model,
+                                                             final ResourceHandlerRequest<ResourceModel> request) {
         return UpdateApplicationRequest.builder()
             .applicationId(model.getApplicationId())
             .clientToken(request.getClientRequestToken())
@@ -429,6 +489,8 @@ public class Translator {
             .maximumCapacity(translate(model.getMaximumCapacity()))
             .networkConfiguration(translate(model.getNetworkConfiguration()))
             .architecture(translate(model.getArchitecture()))
+            .imageConfiguration(translate(model.getImageConfiguration()))
+            .workerTypeSpecifications(translateToWorkerTypeSpecMap(model.getWorkerTypeSpecifications()))
             .build();
     }
 
@@ -467,7 +529,7 @@ public class Translator {
     /**
      * Request to add tags to a resource
      *
-     * @param arn resource arn
+     * @param arn       resource arn
      * @param addedTags Map of tags to be added
      * @return awsRequest the aws service request to create a resource
      */
@@ -482,7 +544,7 @@ public class Translator {
     /**
      * Request to add tags to a resource
      *
-     * @param arn resource arn
+     * @param arn         resource arn
      * @param removedTags Map of tags to be removed
      * @return awsRequest the aws service request to create a resource
      */

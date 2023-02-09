@@ -71,3 +71,4 @@ _Maximum_: <code>15</code>
 _Pattern_: <code>^[1-9][0-9]*(\s)?(GB|gb|gB|Gb)$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+

@@ -93,21 +93,21 @@ public class UpdateHandlerTest extends AbstractTestBase {
         GetApplicationResponse postUpdateApplicationResponse = getApplicationResponse(getUpdatedApplication(ApplicationState.CREATED, DESIRED_APPLICATION_TAGS));
 
         when(sdkClient.updateApplication(any(UpdateApplicationRequest.class)))
-            .thenReturn(updateApplicationResponse);
+                .thenReturn(updateApplicationResponse);
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(postUpdateApplicationResponse);
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(postUpdateApplicationResponse);
         when(sdkClient.tagResource(any(TagResourceRequest.class)))
-            .thenReturn(TagResourceResponse.builder().build());
+                .thenReturn(TagResourceResponse.builder().build());
         when(sdkClient.untagResource(any(UntagResourceRequest.class)))
-            .thenReturn(UntagResourceResponse.builder().build());
+                .thenReturn(UntagResourceResponse.builder().build());
 
         final ResourceModel model = Translator.translateFromReadResponse(postUpdateApplicationResponse);
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceTags(DESIRED_APPLICATION_TAGS)
-            .desiredResourceState(model)
-            .build();
+                .desiredResourceTags(DESIRED_APPLICATION_TAGS)
+                .desiredResourceState(model)
+                .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response = updateHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -131,19 +131,19 @@ public class UpdateHandlerTest extends AbstractTestBase {
         GetApplicationResponse postUpdateApplicationResponse = getApplicationResponse(getApplication(ApplicationState.CREATED, Collections.emptyMap()));
 
         when(sdkClient.updateApplication(any(UpdateApplicationRequest.class)))
-            .thenReturn(updateApplicationResponse);
+                .thenReturn(updateApplicationResponse);
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(postUpdateApplicationResponse);
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(postUpdateApplicationResponse);
         final ResourceModel model = ResourceModel.builder()
-            .arn(APPLICATION_ARN)
-            .applicationId(APPLICATION_ID)
-            .build();
+                .arn(APPLICATION_ARN)
+                .applicationId(APPLICATION_ID)
+                .build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .desiredResourceTags(Collections.emptyMap())
-            .build();
+                .desiredResourceState(model)
+                .desiredResourceTags(Collections.emptyMap())
+                .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response = updateHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -168,23 +168,23 @@ public class UpdateHandlerTest extends AbstractTestBase {
         GetApplicationResponse postUpdateApplicationResponse = getApplicationResponse(getApplication(ApplicationState.CREATED, DESIRED_APPLICATION_TAGS));
 
         when(sdkClient.updateApplication(any(UpdateApplicationRequest.class)))
-            .thenReturn(updateApplicationResponse);
+                .thenReturn(updateApplicationResponse);
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(postUpdateApplicationResponse);
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(postUpdateApplicationResponse);
         when(sdkClient.tagResource(any(TagResourceRequest.class)))
-            .thenReturn(TagResourceResponse.builder().build());
+                .thenReturn(TagResourceResponse.builder().build());
 
         final ResourceModel model = ResourceModel.builder()
-            .arn(APPLICATION_ARN)
-            .applicationId(APPLICATION_ID)
-            .tags(TagHelper.convertToSet(DESIRED_APPLICATION_TAGS))
-            .build();
+                .arn(APPLICATION_ARN)
+                .applicationId(APPLICATION_ID)
+                .tags(TagHelper.convertToSet(DESIRED_APPLICATION_TAGS))
+                .build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .desiredResourceTags(DESIRED_APPLICATION_TAGS)
-            .build();
+                .desiredResourceState(model)
+                .desiredResourceTags(DESIRED_APPLICATION_TAGS)
+                .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response = updateHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -208,22 +208,22 @@ public class UpdateHandlerTest extends AbstractTestBase {
         GetApplicationResponse postUpdateApplicationResponse = getApplicationResponse(getApplication(ApplicationState.CREATED, Collections.emptyMap()));
 
         when(sdkClient.updateApplication(any(UpdateApplicationRequest.class)))
-            .thenReturn(updateApplicationResponse);
+                .thenReturn(updateApplicationResponse);
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(postUpdateApplicationResponse);
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(postUpdateApplicationResponse);
         when(sdkClient.untagResource(any(UntagResourceRequest.class)))
-            .thenReturn(UntagResourceResponse.builder().build());
+                .thenReturn(UntagResourceResponse.builder().build());
 
         final ResourceModel model = ResourceModel.builder()
-            .arn(APPLICATION_ARN)
-            .applicationId(APPLICATION_ID)
-            .build();
+                .arn(APPLICATION_ARN)
+                .applicationId(APPLICATION_ID)
+                .build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .desiredResourceTags(Collections.emptyMap())
-            .build();
+                .desiredResourceState(model)
+                .desiredResourceTags(Collections.emptyMap())
+                .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response = updateHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -245,7 +245,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     public void handleRequest_exceptionInUpdateApplication(Exception sdkException, BaseHandlerException cfnException) {
         GetApplicationResponse initialApplicationResponse = getApplicationResponse(getApplication(ApplicationState.CREATED, INITIAL_APPLICATION_TAGS));
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenReturn(initialApplicationResponse);
+                .thenReturn(initialApplicationResponse);
         when(sdkClient.updateApplication(any(UpdateApplicationRequest.class))).thenThrow(sdkException);
 
         final ResourceModel model = ResourceModel.builder()
@@ -280,23 +280,23 @@ public class UpdateHandlerTest extends AbstractTestBase {
         GetApplicationResponse postUpdateApplicationResponse = getApplicationResponse(getApplication(ApplicationState.CREATED, DESIRED_APPLICATION_TAGS));
 
         when(sdkClient.updateApplication(any(UpdateApplicationRequest.class)))
-            .thenReturn(updateApplicationResponse);
+                .thenReturn(updateApplicationResponse);
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(postUpdateApplicationResponse);
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(postUpdateApplicationResponse);
         when(sdkClient.untagResource(any(UntagResourceRequest.class)))
-            .thenThrow(InternalServerException.class);
+                .thenThrow(InternalServerException.class);
 
         final ResourceModel model = ResourceModel.builder()
-            .arn(APPLICATION_ARN)
-            .applicationId(APPLICATION_ID)
-            .tags(TagHelper.convertToSet(DESIRED_APPLICATION_TAGS))
-            .build();
+                .arn(APPLICATION_ARN)
+                .applicationId(APPLICATION_ID)
+                .tags(TagHelper.convertToSet(DESIRED_APPLICATION_TAGS))
+                .build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .desiredResourceTags(DESIRED_APPLICATION_TAGS)
-            .build();
+                .desiredResourceState(model)
+                .desiredResourceTags(DESIRED_APPLICATION_TAGS)
+                .build();
         final ProgressEvent<ResourceModel, CallbackContext> response = updateHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
@@ -316,25 +316,25 @@ public class UpdateHandlerTest extends AbstractTestBase {
         GetApplicationResponse postUpdateApplicationResponse = getApplicationResponse(getApplication(ApplicationState.CREATED, DESIRED_APPLICATION_TAGS));
 
         when(sdkClient.updateApplication(any(UpdateApplicationRequest.class)))
-            .thenReturn(updateApplicationResponse);
+                .thenReturn(updateApplicationResponse);
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(initialApplicationResponse)
-            .thenReturn(postUpdateApplicationResponse);
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(postUpdateApplicationResponse);
         when(sdkClient.tagResource(any(TagResourceRequest.class)))
-            .thenThrow(InternalServerException.class);
+                .thenThrow(InternalServerException.class);
         when(sdkClient.untagResource(any(UntagResourceRequest.class)))
-            .thenReturn(UntagResourceResponse.builder().build());
+                .thenReturn(UntagResourceResponse.builder().build());
 
         final ResourceModel model = ResourceModel.builder()
-            .arn(APPLICATION_ARN)
-            .applicationId(APPLICATION_ID)
-            .tags(TagHelper.convertToSet(DESIRED_APPLICATION_TAGS))
-            .build();
+                .arn(APPLICATION_ARN)
+                .applicationId(APPLICATION_ID)
+                .tags(TagHelper.convertToSet(DESIRED_APPLICATION_TAGS))
+                .build();
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .desiredResourceTags(DESIRED_APPLICATION_TAGS)
-            .build();
+                .desiredResourceState(model)
+                .desiredResourceTags(DESIRED_APPLICATION_TAGS)
+                .build();
         final ProgressEvent<ResourceModel, CallbackContext> response = updateHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
@@ -353,13 +353,13 @@ public class UpdateHandlerTest extends AbstractTestBase {
         GetApplicationResponse postUpdateExpectedResponse = getApplicationResponse(getUpdatedApplication(ApplicationState.CREATED, DESIRED_APPLICATION_TAGS));
 
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenReturn(initialApplicationResponse);
+                .thenReturn(initialApplicationResponse);
 
         final ResourceModel model = Translator.translateFromReadResponse(postUpdateExpectedResponse);
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .desiredResourceTags(DESIRED_APPLICATION_TAGS)
-            .build();
+                .desiredResourceState(model)
+                .desiredResourceTags(DESIRED_APPLICATION_TAGS)
+                .build();
         final ProgressEvent<ResourceModel, CallbackContext> response = updateHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
@@ -375,51 +375,51 @@ public class UpdateHandlerTest extends AbstractTestBase {
     private UpdateApplicationResponse updateApplicationResponse() {
         Application application = getApplication(APPLICATION_ID, ApplicationState.CREATED);
         return UpdateApplicationResponse.builder()
-            .application(application)
-            .build();
+                .application(application)
+                .build();
     }
 
     //Returns custom application with different values than the default application in AbstractTestBase class
     private Application getUpdatedApplication(ApplicationState state, Map<String, String> tags) {
         return getDefaultApplicationBuilder()
-            .state(state)
-            .autoStartConfiguration(AutoStartConfig.builder()
-                .enabled(true)
-                .build())
-            .autoStopConfiguration(AutoStopConfig.builder()
-                .enabled(false)
-                .idleTimeoutMinutes(10)
-                .build())
-            .initialCapacity(
-                ImmutableMap.<String, software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig>builder()
-                    .put("DRIVER", software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig.builder()
-                        .workerCount(3L)
-                        .workerConfiguration(WorkerResourceConfig.builder()
-                            .cpu("update-driver-cpu")
-                            .disk("update-driver-disk")
-                            .memory("update-driver-memory")
-                            .build())
+                .state(state)
+                .autoStartConfiguration(AutoStartConfig.builder()
+                        .enabled(true)
                         .build())
-                    .put("EXECUTOR", software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig.builder()
-                        .workerCount(5L)
-                        .workerConfiguration(WorkerResourceConfig.builder()
-                            .cpu("update-executor-cpu")
-                            .disk("update-executor-disk")
-                            .memory("update-executor-memory")
-                            .build())
+                .autoStopConfiguration(AutoStopConfig.builder()
+                        .enabled(false)
+                        .idleTimeoutMinutes(10)
                         .build())
-                    .build())
-            .maximumCapacity(software.amazon.awssdk.services.emrserverless.model.MaximumAllowedResources.builder()
-                .cpu("update-max-cpu")
-                .disk("update-max-disk")
-                .memory("update-max-memory")
-                .build())
-            .networkConfiguration(software.amazon.awssdk.services.emrserverless.model.NetworkConfiguration.builder()
-                .subnetIds(ImmutableSet.of("update-subnet-1", "update-subnet-2"))
-                .securityGroupIds(ImmutableSet.of("update-sg-1", "update-sg-2"))
-                .build())
-            .tags(tags)
-            .build();
+                .initialCapacity(
+                        ImmutableMap.<String, software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig>builder()
+                                .put("DRIVER", software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig.builder()
+                                        .workerCount(3L)
+                                        .workerConfiguration(WorkerResourceConfig.builder()
+                                                .cpu("update-driver-cpu")
+                                                .disk("update-driver-disk")
+                                                .memory("update-driver-memory")
+                                                .build())
+                                        .build())
+                                .put("EXECUTOR", software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig.builder()
+                                        .workerCount(5L)
+                                        .workerConfiguration(WorkerResourceConfig.builder()
+                                                .cpu("update-executor-cpu")
+                                                .disk("update-executor-disk")
+                                                .memory("update-executor-memory")
+                                                .build())
+                                        .build())
+                                .build())
+                .maximumCapacity(software.amazon.awssdk.services.emrserverless.model.MaximumAllowedResources.builder()
+                        .cpu("update-max-cpu")
+                        .disk("update-max-disk")
+                        .memory("update-max-memory")
+                        .build())
+                .networkConfiguration(software.amazon.awssdk.services.emrserverless.model.NetworkConfiguration.builder()
+                        .subnetIds(ImmutableSet.of("update-subnet-1", "update-subnet-2"))
+                        .securityGroupIds(ImmutableSet.of("update-sg-1", "update-sg-2"))
+                        .build())
+                .tags(tags)
+                .build();
     }
 
     /**
