@@ -28,11 +28,11 @@ public class CreateHandler extends BaseHandlerStd {
         ApplicationState.STOPPED);
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-        final AmazonWebServicesClientProxy proxy,
-        final ResourceHandlerRequest<ResourceModel> request,
-        final CallbackContext callbackContext,
-        final ProxyClient<EmrServerlessClient> proxyClient,
-        final Logger logger) {
+            final AmazonWebServicesClientProxy proxy,
+            final ResourceHandlerRequest<ResourceModel> request,
+            final CallbackContext callbackContext,
+            final ProxyClient<EmrServerlessClient> proxyClient,
+            final Logger logger) {
         this.logger = logger;
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
             .then(progress -> createApplication(proxy, request, progress.getResourceModel(), proxyClient, callbackContext))
@@ -45,21 +45,21 @@ public class CreateHandler extends BaseHandlerStd {
                                                                             final ProxyClient<EmrServerlessClient> proxyClient,
                                                                             final CallbackContext callbackContext) {
         return proxy.initiate("AWS-EMRServerless-Application::Create", proxyClient, resourceModel,callbackContext)
-            .translateToServiceRequest((model -> Translator.translateToCreateRequest(model, request)))
-            .makeServiceCall((createApplicationRequest, proxyInvocationClient) -> {
-                CreateApplicationResponse createApplicationResponse = callCreateApplication(createApplicationRequest, proxyInvocationClient);
-                resourceModel.setApplicationId(createApplicationResponse.applicationId());
-                return createApplicationResponse;
-            })
-            .stabilize((awsRequest, awsResponse, proxyInvocation, model, context) -> isStabilizedForCreate(model, proxyInvocation, context))
-            .handleError(this::handleError)
-            .progress();
+                .translateToServiceRequest((model -> Translator.translateToCreateRequest(model, request)))
+                .makeServiceCall((createApplicationRequest, proxyInvocationClient) -> {
+                    CreateApplicationResponse createApplicationResponse = callCreateApplication(createApplicationRequest, proxyInvocationClient);
+                    resourceModel.setApplicationId(createApplicationResponse.applicationId());
+                    return createApplicationResponse;
+                })
+                .stabilize((awsRequest, awsResponse, proxyInvocation, model, context) -> isStabilizedForCreate(model, proxyInvocation, context))
+                .handleError(this::handleError)
+                .progress();
     }
 
 
-    //Calls downstream service to create the application resource
+     //Calls downstream service to create the application resource
     private CreateApplicationResponse callCreateApplication(final CreateApplicationRequest createApplicationRequest,
-                                                            final ProxyClient<EmrServerlessClient> proxyClient) {
+                                                           final ProxyClient<EmrServerlessClient> proxyClient) {
         try {
             CreateApplicationResponse response = proxyClient.injectCredentialsAndInvokeV2(createApplicationRequest, proxyClient.client()::createApplication);
             logger.log(String.format("[INFO] %s has successfully been created.", ResourceModel.TYPE_NAME));

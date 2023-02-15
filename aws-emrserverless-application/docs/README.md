@@ -21,7 +21,9 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>,
         "<a href="#autostartconfiguration" title="AutoStartConfiguration">AutoStartConfiguration</a>" : <i><a href="autostartconfiguration.md">AutoStartConfiguration</a></i>,
         "<a href="#autostopconfiguration" title="AutoStopConfiguration">AutoStopConfiguration</a>" : <i><a href="autostopconfiguration.md">AutoStopConfiguration</a></i>,
+        "<a href="#imageconfiguration" title="ImageConfiguration">ImageConfiguration</a>" : <i><a href="imageconfigurationinput.md">ImageConfigurationInput</a></i>,
         "<a href="#networkconfiguration" title="NetworkConfiguration">NetworkConfiguration</a>" : <i><a href="networkconfiguration.md">NetworkConfiguration</a></i>,
+        "<a href="#workertypespecifications" title="WorkerTypeSpecifications">WorkerTypeSpecifications</a>" : <i><a href="workertypespecifications.md">WorkerTypeSpecifications</a></i>
     }
 }
 </pre>
@@ -42,7 +44,9 @@ Properties:
       - <a href="tag.md">Tag</a></i>
     <a href="#autostartconfiguration" title="AutoStartConfiguration">AutoStartConfiguration</a>: <i><a href="autostartconfiguration.md">AutoStartConfiguration</a></i>
     <a href="#autostopconfiguration" title="AutoStopConfiguration">AutoStopConfiguration</a>: <i><a href="autostopconfiguration.md">AutoStopConfiguration</a></i>
+    <a href="#imageconfiguration" title="ImageConfiguration">ImageConfiguration</a>: <i><a href="imageconfigurationinput.md">ImageConfigurationInput</a></i>
     <a href="#networkconfiguration" title="NetworkConfiguration">NetworkConfiguration</a>: <i><a href="networkconfiguration.md">NetworkConfiguration</a></i>
+    <a href="#workertypespecifications" title="WorkerTypeSpecifications">WorkerTypeSpecifications</a>: <i><a href="workertypespecifications.md">WorkerTypeSpecifications</a></i>
 </pre>
 
 ## Properties
@@ -57,8 +61,7 @@ _Type_: String
 
 _Allowed Values_: <code>ARM64</code> | <code>X86_64</code>
 
-_Update requires_: [Some interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-some-interrupt)
-
+_Update requires_: [Some Interruptions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#updates-with-some-interruption)
 #### Name
 
 User friendly Application name.
@@ -147,6 +150,15 @@ _Type_: <a href="autostopconfiguration.md">AutoStopConfiguration</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
+#### ImageConfiguration
+
+The image configuration.
+
+_Required_: No
+
+_Type_: <a href="imageconfigurationinput.md">ImageConfigurationInput</a>
+
+_Update requires_: [Some Interruptions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#updates-with-some-interruption)
 #### NetworkConfiguration
 
 _Required_: No
@@ -155,6 +167,13 @@ _Type_: <a href="networkconfiguration.md">NetworkConfiguration</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
+#### WorkerTypeSpecifications
+
+_Required_: No
+
+_Type_: <a href="workertypespecifications.md">WorkerTypeSpecifications</a>
+
+_Update requires_: [Some Interruptions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#updates-with-some-interruption)
 ## Return Values
 
 ### Ref

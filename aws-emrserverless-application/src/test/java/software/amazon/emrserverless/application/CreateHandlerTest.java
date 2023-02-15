@@ -69,14 +69,14 @@ public class CreateHandlerTest extends AbstractTestBase {
     public void handleRequest_SimpleSuccess() {
         CreateApplicationResponse createApplicationResponse = createApplicationResponse();
         GetApplicationResponse applicationCreatingResponse = getApplicationResponse(
-            getApplication(APPLICATION_ID, ApplicationState.CREATING));
+                getApplication(APPLICATION_ID, ApplicationState.CREATING));
         GetApplicationResponse applicationCreatedResponse = getApplicationResponse(
-            getApplication(APPLICATION_ID, ApplicationState.CREATED));
+                getApplication(APPLICATION_ID, ApplicationState.CREATED));
 
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenReturn(applicationCreatingResponse).thenReturn(applicationCreatedResponse);
+                .thenReturn(applicationCreatingResponse).thenReturn(applicationCreatedResponse);
         when(sdkClient.createApplication(any(CreateApplicationRequest.class)))
-            .thenReturn(createApplicationResponse);
+                .thenReturn(createApplicationResponse);
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
             .desiredResourceState(getResourceModel(APPLICATION_ID))
@@ -100,18 +100,18 @@ public class CreateHandlerTest extends AbstractTestBase {
     public void handleRequest_SuccessMovedToSTARTEDState() {
         CreateApplicationResponse createApplicationResponse = createApplicationResponse();
         GetApplicationResponse applicationCreatingResponse = getApplicationResponse(
-            getApplication(APPLICATION_ID, ApplicationState.CREATING));
+                getApplication(APPLICATION_ID, ApplicationState.CREATING));
         GetApplicationResponse applicationCreatedResponse = getApplicationResponse(
-            getApplication(APPLICATION_ID, ApplicationState.CREATED));
+                getApplication(APPLICATION_ID, ApplicationState.CREATED));
 
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenReturn(applicationCreatingResponse).thenReturn(applicationCreatedResponse);
+                .thenReturn(applicationCreatingResponse).thenReturn(applicationCreatedResponse);
         when(sdkClient.createApplication(any(CreateApplicationRequest.class)))
-            .thenReturn(createApplicationResponse);
+                .thenReturn(createApplicationResponse);
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(ResourceModel.builder().build())
-            .build();
+                .desiredResourceState(ResourceModel.builder().build())
+                .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response = createHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -153,13 +153,13 @@ public class CreateHandlerTest extends AbstractTestBase {
         CreateApplicationResponse createApplicationResponse = createApplicationResponse();
 
         when(sdkClient.createApplication(any(CreateApplicationRequest.class)))
-            .thenReturn(createApplicationResponse);
+                .thenReturn(createApplicationResponse);
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenThrow(InternalServerException.class);
+                .thenThrow(InternalServerException.class);
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(ResourceModel.builder().build())
-            .build();
+                .desiredResourceState(ResourceModel.builder().build())
+                .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response = createHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -175,18 +175,18 @@ public class CreateHandlerTest extends AbstractTestBase {
     public void handleRequest_NotStabilized() {
         CreateApplicationResponse createApplicationResponse = createApplicationResponse();
         GetApplicationResponse applicationCreatingResponse = getApplicationResponse(
-            getApplication(APPLICATION_ID, ApplicationState.CREATING));
+                getApplication(APPLICATION_ID, ApplicationState.CREATING));
         GetApplicationResponse applicationTerminatedResponse = getApplicationResponse(
-            getApplication(APPLICATION_ID, ApplicationState.TERMINATED));
+                getApplication(APPLICATION_ID, ApplicationState.TERMINATED));
 
         when(sdkClient.createApplication(any(CreateApplicationRequest.class)))
-            .thenReturn(createApplicationResponse);
+                .thenReturn(createApplicationResponse);
         when(sdkClient.getApplication(any(GetApplicationRequest.class)))
-            .thenReturn(applicationCreatingResponse).thenReturn(applicationTerminatedResponse);
+                .thenReturn(applicationCreatingResponse).thenReturn(applicationTerminatedResponse);
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(ResourceModel.builder().build())
-            .build();
+                .desiredResourceState(ResourceModel.builder().build())
+                .build();
 
         final ProgressEvent<ResourceModel, CallbackContext> response = createHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -200,10 +200,10 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     private CreateApplicationResponse createApplicationResponse() {
         return CreateApplicationResponse.builder()
-            .applicationId(APPLICATION_ID)
-            .arn(APPLICATION_ARN)
-            .name(APPLICATION_NAME)
-            .build();
+                .applicationId(APPLICATION_ID)
+                .arn(APPLICATION_ARN)
+                .name(APPLICATION_NAME)
+                .build();
     }
 
     /**

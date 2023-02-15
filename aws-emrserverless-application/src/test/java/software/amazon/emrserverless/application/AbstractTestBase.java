@@ -2,6 +2,7 @@ package software.amazon.emrserverless.application;
 
 import java.time.Instant;
 import java.time.Period;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -18,7 +19,6 @@ import com.google.common.collect.Sets;
 
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.pagination.sync.SdkIterable;
@@ -26,16 +26,18 @@ import software.amazon.awssdk.services.emrserverless.EmrServerlessClient;
 import software.amazon.awssdk.services.emrserverless.model.Application;
 import software.amazon.awssdk.services.emrserverless.model.ApplicationState;
 import software.amazon.awssdk.services.emrserverless.model.ApplicationSummary;
+import software.amazon.awssdk.services.emrserverless.model.Architecture;
 import software.amazon.awssdk.services.emrserverless.model.AutoStartConfig;
 import software.amazon.awssdk.services.emrserverless.model.AutoStopConfig;
 import software.amazon.awssdk.services.emrserverless.model.ConflictException;
 import software.amazon.awssdk.services.emrserverless.model.GetApplicationResponse;
+import software.amazon.awssdk.services.emrserverless.model.ImageConfiguration;
 import software.amazon.awssdk.services.emrserverless.model.InternalServerException;
 import software.amazon.awssdk.services.emrserverless.model.ListApplicationsResponse;
 import software.amazon.awssdk.services.emrserverless.model.ResourceNotFoundException;
-import software.amazon.awssdk.services.emrserverless.model.ServiceQuotaExceededException;
 import software.amazon.awssdk.services.emrserverless.model.ValidationException;
 import software.amazon.awssdk.services.emrserverless.model.WorkerResourceConfig;
+import software.amazon.awssdk.services.emrserverless.model.WorkerTypeSpecification;
 import software.amazon.cloudformation.exceptions.BaseHandlerException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Credentials;
@@ -90,12 +92,10 @@ public abstract class AbstractTestBase {
         .message("internal server error").build();
     protected static final ConflictException CONFLICT_EXCEPTION = ConflictException.builder()
         .message("conflict exception").build();
-    protected static final ServiceQuotaExceededException SERVICE_QUOTA_EXCEEDED_EXCEPTION = ServiceQuotaExceededException.builder()
-        .message("service quota exceeded").build();
-    protected static final AwsServiceException GENERIC_SERVICE_EXCEPTION = AwsServiceException.builder()
-        .message("generic service exception")
-        .build();
-    protected static final String ARCHITECTURE = "X86_64";
+    protected static final Architecture ARCHITECTURE = Architecture.X86_64;
+    protected static final String IMAGE_URI = "image uri";
+    protected static final String IMAGE_DIGEST = "image digest";
+    protected static final String WORKER_TYPE = "worker type";
 
     static {
         MOCK_CREDENTIALS = new Credentials("accessKey", "secretKey", "token");
@@ -122,6 +122,16 @@ public abstract class AbstractTestBase {
     }
 
     protected Application.Builder getDefaultApplicationBuilder() {
+        Map<String, WorkerTypeSpecification> workerTypeSpecificationMap = new HashMap<>();
+        workerTypeSpecificationMap.put(
+            WORKER_TYPE, WorkerTypeSpecification.builder()
+                .imageConfiguration(ImageConfiguration.builder()
+                    .imageUri(IMAGE_URI)
+                    .resolvedImageDigest(IMAGE_DIGEST)
+                    .build())
+                .build()
+        );
+
         return Application.builder()
             .applicationId(APPLICATION_ID)
             .arn(APPLICATION_ARN)
@@ -155,6 +165,10 @@ public abstract class AbstractTestBase {
                             .build())
                         .build())
                     .build())
+            .imageConfiguration(software.amazon.awssdk.services.emrserverless.model.ImageConfiguration.builder()
+                .imageUri(IMAGE_URI)
+                .resolvedImageDigest(IMAGE_DIGEST)
+                .build())
             .maximumCapacity(software.amazon.awssdk.services.emrserverless.model.MaximumAllowedResources.builder()
                 .cpu(MAX_CPU)
                 .disk(MAX_DISK)
@@ -169,7 +183,8 @@ public abstract class AbstractTestBase {
             .state(APPLICATION_STATE)
             .stateDetails(APPLICATION_STATE_DETAILS)
             .createdAt(APPLICATION_CREATED_AT)
-            .updatedAt(APPLICATION_UPDATED_AT);
+            .updatedAt(APPLICATION_UPDATED_AT)
+            .workerTypeSpecifications(workerTypeSpecificationMap);
     }
 
     protected ListApplicationsResponse getListApplicationsResponse() {
@@ -195,19 +210,31 @@ public abstract class AbstractTestBase {
     }
 
     protected ResourceModel getResourceModel(String applicationId, Map<String, String> tags) {
+        Map<String, WorkerTypeSpecificationInput> workerTypeSpecificationInputMap = new HashMap<>();
+        workerTypeSpecificationInputMap.put(
+            WORKER_TYPE, WorkerTypeSpecificationInput.builder()
+                .imageConfiguration(ImageConfigurationInput.builder()
+                    .imageUri(IMAGE_URI)
+                    .build())
+                .build()
+        );
+
         return ResourceModel.builder()
             .applicationId(applicationId)
             .name(APPLICATION_NAME)
             .type(APPLICATION_TYPE)
             .arn(APPLICATION_ARN)
             .releaseLabel(RELEASE_LABEL)
-            .architecture(ARCHITECTURE)
+            .architecture(ARCHITECTURE.name())
             .autoStartConfiguration(AutoStartConfiguration.builder()
                 .enabled(AUTO_START_ENABLED)
                 .build())
             .autoStopConfiguration(AutoStopConfiguration.builder()
                 .enabled(AUTO_STOP_ENABLED)
                 .idleTimeoutMinutes(AUTO_STOP_IDLE_TIMEOUT)
+                .build())
+            .imageConfiguration(ImageConfigurationInput.builder()
+                .imageUri(IMAGE_URI)
                 .build())
             .initialCapacity(Sets.newHashSet(
                 InitialCapacityConfigKeyValuePair.builder()
@@ -248,6 +275,7 @@ public abstract class AbstractTestBase {
                     .value(entry.getValue())
                     .build())
                 .collect(Collectors.toSet()))
+            .workerTypeSpecifications(workerTypeSpecificationInputMap)
             .build();
     }
 

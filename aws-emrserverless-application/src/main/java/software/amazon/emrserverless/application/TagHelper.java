@@ -16,7 +16,7 @@ public class TagHelper {
     /**
      * convertToMap
      *
-     * Converts a collection of Tag objects to a tag-name -> tag-value map.
+     * Converts a collection of Tag objects to a tag-name, tag-value map.
      *
      * Note: Tag objects with null tag values will not be included in the output
      * map.

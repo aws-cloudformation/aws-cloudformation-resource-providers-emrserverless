@@ -38,6 +38,7 @@ Resources:
                 - "emr-serverless:UntagResource"
                 - "emr-serverless:UpdateApplication"
                 - "iam:CreateServiceLinkedRole"
+                - "ec2:CreateNetworkInterface"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
