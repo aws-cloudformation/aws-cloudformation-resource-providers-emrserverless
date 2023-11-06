@@ -66,6 +66,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
         "tag-key-3", "tag-value-3"
     );
     private static final String UPDATE_OPERATION = "UpdateApplication";
+    private static final String UPDATED_RELEASE_LABEL = "spark-6.10.0-preview";
 
     @Mock
     private AmazonWebServicesClientProxy proxy;
@@ -119,6 +120,46 @@ public class UpdateHandlerTest extends AbstractTestBase {
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModel()).isEqualTo(model);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handleRequest_SuccessWithUpdatedReleaseLabel() {
+        UpdateApplicationResponse updateApplicationResponse = updateApplicationResponse();
+        GetApplicationResponse initialApplicationResponse =
+                getApplicationResponse(getApplication(ApplicationState.CREATED, Collections.emptyMap()));
+        GetApplicationResponse postUpdateApplicationResponse =
+                getApplicationResponse(getApplicationWithUpdatedReleaseLabel(ApplicationState.CREATED,
+                        Collections.emptyMap()));
+
+        when(sdkClient.updateApplication(any(UpdateApplicationRequest.class)))
+                .thenReturn(updateApplicationResponse);
+        when(sdkClient.getApplication(any(GetApplicationRequest.class)))
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(postUpdateApplicationResponse);
+        final ResourceModel model = ResourceModel.builder()
+                .arn(APPLICATION_ARN)
+                .applicationId(APPLICATION_ID)
+                .build();
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .desiredResourceTags(Collections.emptyMap())
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+                updateHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        assertThat(response).isNotNull();
+        verify(sdkClient).updateApplication(any(UpdateApplicationRequest.class));
+        verify(sdkClient, never()).tagResource(any(TagResourceRequest.class));
+        verify(sdkClient, never()).untagResource(any(UntagResourceRequest.class));
+        verify(sdkClient, times(3)).getApplication(any(GetApplicationRequest.class));
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(getResourceModel(APPLICATION_ID, Collections.emptyMap(), UPDATED_RELEASE_LABEL));
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();

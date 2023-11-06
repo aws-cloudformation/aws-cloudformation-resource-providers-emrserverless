@@ -30,9 +30,9 @@ _Required_: Yes
 
 _Type_: String
 
-_Minimum_: <code>1</code>
+_Minimum Length_: <code>1</code>
 
-_Maximum_: <code>50</code>
+_Maximum Length_: <code>50</code>
 
 _Pattern_: <code>^[a-zA-Z]+[-_]*[a-zA-Z]+$</code>
 

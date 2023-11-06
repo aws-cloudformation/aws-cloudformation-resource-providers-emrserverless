@@ -53,6 +53,7 @@ public abstract class AbstractTestBase {
     protected static final String APPLICATION_NAME = "name";
     private static final String APPLICATION_TYPE = "SPARK";
     private static final String RELEASE_LABEL = "spark-6.5.0-preview";
+    private static final String UPDATED_RELEASE_LABEL = "spark-6.10.0-preview";
     private static final Boolean AUTO_START_ENABLED = Boolean.FALSE;
     private static final Boolean AUTO_STOP_ENABLED = Boolean.TRUE;
     private static final Integer AUTO_STOP_IDLE_TIMEOUT = 300;
@@ -76,6 +77,11 @@ public abstract class AbstractTestBase {
         "tag-key-1", "tag-value-1",
         "tag-key-2", "tag-value-2",
         "tag-key-3", "tag-value-3"
+    );
+    protected static final Map<String, String> RUNTIME_CONFIGURATION_PROPERTIES = ImmutableMap.of(
+            "property-key-1", "property-value-1",
+            "property-key-2", "property-value-2",
+            "property-key-3", "property-value-3"
     );
     private static final Instant APPLICATION_CREATED_AT = Instant.now().minus(Period.ofDays(10));
     private static final Instant APPLICATION_UPDATED_AT = Instant.now().minus(Period.ofDays(2));
@@ -121,6 +127,14 @@ public abstract class AbstractTestBase {
             .build();
     }
 
+    protected Application getApplicationWithUpdatedReleaseLabel(ApplicationState state, Map<String, String> tags) {
+        return getDefaultApplicationBuilder()
+                .releaseLabel(UPDATED_RELEASE_LABEL)
+                .state(state)
+                .tags(tags)
+                .build();
+    }
+
     protected Application.Builder getDefaultApplicationBuilder() {
         Map<String, WorkerTypeSpecification> workerTypeSpecificationMap = new HashMap<>();
         workerTypeSpecificationMap.put(
@@ -133,58 +147,73 @@ public abstract class AbstractTestBase {
         );
 
         return Application.builder()
-            .applicationId(APPLICATION_ID)
-            .arn(APPLICATION_ARN)
-            .name(APPLICATION_NAME)
-            .type(APPLICATION_TYPE)
-            .releaseLabel(RELEASE_LABEL)
-            .architecture(ARCHITECTURE)
-            .autoStartConfiguration(AutoStartConfig.builder()
-                .enabled(AUTO_START_ENABLED)
-                .build())
-            .autoStopConfiguration(AutoStopConfig.builder()
-                .enabled(AUTO_STOP_ENABLED)
-                .idleTimeoutMinutes(AUTO_STOP_IDLE_TIMEOUT)
-                .build())
-            .initialCapacity(
-                ImmutableMap.<String, software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig>builder()
-                    .put(DRIVER, software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig.builder()
-                        .workerCount(DRIVER_COUNT)
-                        .workerConfiguration(WorkerResourceConfig.builder()
-                            .cpu(DRIVER_CPU)
-                            .disk(DRIVER_DISK)
-                            .memory(DRIVER_MEMORY)
-                            .build())
+                .applicationId(APPLICATION_ID)
+                .arn(APPLICATION_ARN)
+                .name(APPLICATION_NAME)
+                .type(APPLICATION_TYPE)
+                .releaseLabel(RELEASE_LABEL)
+                .architecture(ARCHITECTURE)
+                .autoStartConfiguration(AutoStartConfig.builder()
+                        .enabled(AUTO_START_ENABLED)
                         .build())
-                    .put(EXECUTOR, software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig.builder()
-                        .workerCount(EXECUTOR_COUNT)
-                        .workerConfiguration(WorkerResourceConfig.builder()
-                            .cpu(EXECUTOR_CPU)
-                            .disk(EXECUTOR_DISK)
-                            .memory(EXECUTOR_MEMORY)
-                            .build())
+                .autoStopConfiguration(AutoStopConfig.builder()
+                        .enabled(AUTO_STOP_ENABLED)
+                        .idleTimeoutMinutes(AUTO_STOP_IDLE_TIMEOUT)
                         .build())
-                    .build())
-            .imageConfiguration(software.amazon.awssdk.services.emrserverless.model.ImageConfiguration.builder()
-                .imageUri(IMAGE_URI)
-                .resolvedImageDigest(IMAGE_DIGEST)
-                .build())
-            .maximumCapacity(software.amazon.awssdk.services.emrserverless.model.MaximumAllowedResources.builder()
-                .cpu(MAX_CPU)
-                .disk(MAX_DISK)
-                .memory(MAX_MEMORY)
-                .build())
-            .networkConfiguration(software.amazon.awssdk.services.emrserverless.model.NetworkConfiguration.builder()
-                .subnetIds(SUBNETS)
-                .securityGroupIds(SECURITY_GROUPS)
-                .build())
-            .tags(APPLICATION_TAGS)
-            //Read only settings
-            .state(APPLICATION_STATE)
-            .stateDetails(APPLICATION_STATE_DETAILS)
-            .createdAt(APPLICATION_CREATED_AT)
-            .updatedAt(APPLICATION_UPDATED_AT)
-            .workerTypeSpecifications(workerTypeSpecificationMap);
+                .initialCapacity(
+                        ImmutableMap.<String, software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig>builder()
+                                .put(DRIVER, software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig.builder()
+                                        .workerCount(DRIVER_COUNT)
+                                        .workerConfiguration(WorkerResourceConfig.builder()
+                                                .cpu(DRIVER_CPU)
+                                                .disk(DRIVER_DISK)
+                                                .memory(DRIVER_MEMORY)
+                                                .build())
+                                        .build())
+                                .put(EXECUTOR, software.amazon.awssdk.services.emrserverless.model.InitialCapacityConfig.builder()
+                                        .workerCount(EXECUTOR_COUNT)
+                                        .workerConfiguration(WorkerResourceConfig.builder()
+                                                .cpu(EXECUTOR_CPU)
+                                                .disk(EXECUTOR_DISK)
+                                                .memory(EXECUTOR_MEMORY)
+                                                .build())
+                                        .build())
+                                .build())
+                .imageConfiguration(software.amazon.awssdk.services.emrserverless.model.ImageConfiguration.builder()
+                        .imageUri(IMAGE_URI)
+                        .resolvedImageDigest(IMAGE_DIGEST)
+                        .build())
+                .monitoringConfiguration(software.amazon.awssdk.services.emrserverless.model.MonitoringConfiguration.builder()
+                        .s3MonitoringConfiguration(software.amazon.awssdk.services.emrserverless.model.S3MonitoringConfiguration
+                                .builder().encryptionKeyArn("ENCRYPTION_KEY")
+                                .logUri("s3://98")
+                                .build())
+                        .managedPersistenceMonitoringConfiguration(software.amazon.awssdk.services.emrserverless.model
+                                .ManagedPersistenceMonitoringConfiguration.builder()
+                                .enabled(Boolean.TRUE)
+                                .encryptionKeyArn("ENCRYPTION_KEY").build())
+                        .build())
+                .runtimeConfiguration(Sets.newHashSet(software.amazon.awssdk.services.emrserverless.model.Configuration.builder()
+                        .classification("SPARK")
+                        .properties(RUNTIME_CONFIGURATION_PROPERTIES)
+                        .configurations(Lists.newArrayList())
+                        .build()))
+                .maximumCapacity(software.amazon.awssdk.services.emrserverless.model.MaximumAllowedResources.builder()
+                        .cpu(MAX_CPU)
+                        .disk(MAX_DISK)
+                        .memory(MAX_MEMORY)
+                        .build())
+                .networkConfiguration(software.amazon.awssdk.services.emrserverless.model.NetworkConfiguration.builder()
+                        .subnetIds(SUBNETS)
+                        .securityGroupIds(SECURITY_GROUPS)
+                        .build())
+                .tags(APPLICATION_TAGS)
+                //Read only settings
+                .state(APPLICATION_STATE)
+                .stateDetails(APPLICATION_STATE_DETAILS)
+                .createdAt(APPLICATION_CREATED_AT)
+                .updatedAt(APPLICATION_UPDATED_AT)
+                .workerTypeSpecifications(workerTypeSpecificationMap);
     }
 
     protected ListApplicationsResponse getListApplicationsResponse() {
@@ -209,7 +238,7 @@ public abstract class AbstractTestBase {
             .build();
     }
 
-    protected ResourceModel getResourceModel(String applicationId, Map<String, String> tags) {
+    protected ResourceModel getResourceModel(String applicationId, Map<String, String> tags, String releaseLabel) {
         Map<String, WorkerTypeSpecificationInput> workerTypeSpecificationInputMap = new HashMap<>();
         workerTypeSpecificationInputMap.put(
             WORKER_TYPE, WorkerTypeSpecificationInput.builder()
@@ -220,63 +249,88 @@ public abstract class AbstractTestBase {
         );
 
         return ResourceModel.builder()
-            .applicationId(applicationId)
-            .name(APPLICATION_NAME)
-            .type(APPLICATION_TYPE)
-            .arn(APPLICATION_ARN)
-            .releaseLabel(RELEASE_LABEL)
-            .architecture(ARCHITECTURE.name())
-            .autoStartConfiguration(AutoStartConfiguration.builder()
-                .enabled(AUTO_START_ENABLED)
-                .build())
-            .autoStopConfiguration(AutoStopConfiguration.builder()
-                .enabled(AUTO_STOP_ENABLED)
-                .idleTimeoutMinutes(AUTO_STOP_IDLE_TIMEOUT)
-                .build())
-            .imageConfiguration(ImageConfigurationInput.builder()
-                .imageUri(IMAGE_URI)
-                .build())
-            .initialCapacity(Sets.newHashSet(
-                InitialCapacityConfigKeyValuePair.builder()
-                    .key(DRIVER)
-                    .value(InitialCapacityConfig.builder()
-                        .workerCount(DRIVER_COUNT)
-                        .workerConfiguration(WorkerConfiguration.builder()
-                            .cpu(DRIVER_CPU)
-                            .disk(DRIVER_DISK)
-                            .memory(DRIVER_MEMORY)
-                            .build())
+                .applicationId(applicationId)
+                .name(APPLICATION_NAME)
+                .type(APPLICATION_TYPE)
+                .arn(APPLICATION_ARN)
+                .releaseLabel(releaseLabel)
+                .architecture(ARCHITECTURE.name())
+                .autoStartConfiguration(AutoStartConfiguration.builder()
+                        .enabled(AUTO_START_ENABLED)
                         .build())
-                    .build(),
-                InitialCapacityConfigKeyValuePair.builder()
-                    .key(EXECUTOR)
-                    .value(InitialCapacityConfig.builder()
-                        .workerCount(EXECUTOR_COUNT)
-                        .workerConfiguration(WorkerConfiguration.builder()
-                            .cpu(EXECUTOR_CPU)
-                            .disk(EXECUTOR_DISK)
-                            .memory(EXECUTOR_MEMORY)
-                            .build())
+                .autoStopConfiguration(AutoStopConfiguration.builder()
+                        .enabled(AUTO_STOP_ENABLED)
+                        .idleTimeoutMinutes(AUTO_STOP_IDLE_TIMEOUT)
                         .build())
-                    .build()
-            ))
-            .maximumCapacity(MaximumAllowedResources.builder()
-                .cpu(MAX_CPU)
-                .disk(MAX_DISK)
-                .memory(MAX_MEMORY)
-                .build())
-            .networkConfiguration(NetworkConfiguration.builder()
-                .subnetIds(SUBNETS)
-                .securityGroupIds(SECURITY_GROUPS)
-                .build())
-            .tags(tags.entrySet().stream()
-                .map(entry -> Tag.builder()
-                    .key(entry.getKey())
-                    .value(entry.getValue())
-                    .build())
-                .collect(Collectors.toSet()))
-            .workerTypeSpecifications(workerTypeSpecificationInputMap)
-            .build();
+                .imageConfiguration(ImageConfigurationInput.builder()
+                        .imageUri(IMAGE_URI)
+                        .build())
+                .monitoringConfiguration(MonitoringConfiguration
+                        .builder()
+                        .s3MonitoringConfiguration(software.amazon.emrserverless.application.S3MonitoringConfiguration
+                                .builder()
+                                .encryptionKeyArn("ENCRYPTION_KEY")
+                                .logUri("s3://98")
+                                .build())
+                        .managedPersistenceMonitoringConfiguration(software.amazon.emrserverless.application.ManagedPersistenceMonitoringConfiguration
+                                .builder()
+                                .enabled(Boolean.TRUE)
+                                .encryptionKeyArn("ENCRYPTION_KEY").build())
+                        .build())
+                .runtimeConfiguration(Sets.newHashSet(software.amazon.emrserverless.application.ConfigurationObject.builder()
+                        .classification("SPARK")
+                        .properties(RUNTIME_CONFIGURATION_PROPERTIES)
+                        .configurations(Sets.newHashSet())
+                        .build()))
+                .initialCapacity(Sets.newHashSet(
+                        InitialCapacityConfigKeyValuePair.builder()
+                                .key(DRIVER)
+                                .value(InitialCapacityConfig.builder()
+                                        .workerCount(DRIVER_COUNT)
+                                        .workerConfiguration(WorkerConfiguration.builder()
+                                                .cpu(DRIVER_CPU)
+                                                .disk(DRIVER_DISK)
+                                                .memory(DRIVER_MEMORY)
+                                                .build())
+                                        .build())
+                                .build(),
+                        InitialCapacityConfigKeyValuePair.builder()
+                                .key(EXECUTOR)
+                                .value(InitialCapacityConfig.builder()
+                                        .workerCount(EXECUTOR_COUNT)
+                                        .workerConfiguration(WorkerConfiguration.builder()
+                                                .cpu(EXECUTOR_CPU)
+                                                .disk(EXECUTOR_DISK)
+                                                .memory(EXECUTOR_MEMORY)
+                                                .build())
+                                        .build())
+                                .build()
+                ))
+                .maximumCapacity(MaximumAllowedResources.builder()
+                        .cpu(MAX_CPU)
+                        .disk(MAX_DISK)
+                        .memory(MAX_MEMORY)
+                        .build())
+                .networkConfiguration(NetworkConfiguration.builder()
+                        .subnetIds(SUBNETS)
+                        .securityGroupIds(SECURITY_GROUPS)
+                        .build())
+                .tags(tags.entrySet().stream()
+                        .map(entry -> Tag.builder()
+                                .key(entry.getKey())
+                                .value(entry.getValue())
+                                .build())
+                        .collect(Collectors.toSet()))
+                .workerTypeSpecifications(workerTypeSpecificationInputMap)
+                .build();
+    }
+
+    protected ResourceModel getResourceModel(String applicationId, Map<String, String> tags) {
+        return getResourceModel(applicationId, tags, RELEASE_LABEL);
+    }
+
+    protected ResourceModel getResourceModel(String applicationId) {
+        return getResourceModel(applicationId, APPLICATION_TAGS);
     }
 
     public Stream<Arguments> exceptionArgumentsProvider() {
@@ -286,10 +340,6 @@ public abstract class AbstractTestBase {
     }
 
     protected abstract Map<Exception, BaseHandlerException> getCFNExceptionMapping();
-
-    protected ResourceModel getResourceModel(String applicationId) {
-        return getResourceModel(applicationId, APPLICATION_TAGS);
-    }
 
     static ProxyClient<EmrServerlessClient> MOCK_PROXY(
         final AmazonWebServicesClientProxy proxy,

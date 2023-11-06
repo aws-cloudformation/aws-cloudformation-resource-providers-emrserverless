@@ -28,4 +28,5 @@ _Required_: No
 
 _Type_: <a href="imageconfigurationinput.md">ImageConfigurationInput</a>
 
-_Update requires_: [Some Interruptions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#updates-with-some-interruption)
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
