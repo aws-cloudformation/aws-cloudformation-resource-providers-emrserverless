@@ -173,23 +173,25 @@ public class Translator {
      */
     static ResourceModel translate(final Application sdkApplication) {
         return Optional.ofNullable(sdkApplication)
-            .map(application -> ResourceModel.builder()
-                .applicationId(application.applicationId())
-                .arn(application.arn())
-                .name(application.name())
-                .type(application.type())
-                .releaseLabel(application.releaseLabel())
-                .initialCapacity(translate(application.initialCapacity()))
-                .maximumCapacity(translate(application.maximumCapacity()))
-                .autoStartConfiguration(translate(application.autoStartConfiguration()))
-                .autoStopConfiguration(translate(application.autoStopConfiguration()))
-                .networkConfiguration(translate(application.networkConfiguration()))
-                .tags(TagHelper.convertToSet(application.tags()))
-                .architecture(application.architectureAsString())
-                .imageConfiguration(translate(application.imageConfiguration()))
-                .workerTypeSpecifications(translateToRead(application.workerTypeSpecifications()))
-                .build())
-            .orElse(null);
+                .map(application -> ResourceModel.builder()
+                        .applicationId(application.applicationId())
+                        .arn(application.arn())
+                        .name(application.name())
+                        .type(application.type())
+                        .releaseLabel(application.releaseLabel())
+                        .initialCapacity(translate(application.initialCapacity()))
+                        .maximumCapacity(translate(application.maximumCapacity()))
+                        .autoStartConfiguration(translate(application.autoStartConfiguration()))
+                        .autoStopConfiguration(translate(application.autoStopConfiguration()))
+                        .networkConfiguration(translate(application.networkConfiguration()))
+                        .tags(TagHelper.convertToSet(application.tags()))
+                        .architecture(application.architectureAsString())
+                        .imageConfiguration(translate(application.imageConfiguration()))
+                        .workerTypeSpecifications(translateToRead(application.workerTypeSpecifications()))
+                        .monitoringConfiguration(translate(application.monitoringConfiguration()))
+                        .runtimeConfiguration(translate(application.runtimeConfiguration()))
+                        .build())
+                .orElse(null);
     }
 
     private static Map<String, software.amazon.emrserverless.application.WorkerTypeSpecificationInput> translateToRead(
@@ -214,6 +216,52 @@ public class Translator {
             : software.amazon.emrserverless.application.ImageConfigurationInput.builder()
             .imageUri(imageConfiguration.imageUri())
             .build();
+    }
+
+    private static MonitoringConfiguration translate(software.amazon.awssdk.services.emrserverless.model.MonitoringConfiguration monitoringConfiguration) {
+        return monitoringConfiguration == null
+                ? null
+                : MonitoringConfiguration.builder()
+                .s3MonitoringConfiguration(translate(monitoringConfiguration.s3MonitoringConfiguration()))
+                .managedPersistenceMonitoringConfiguration(translate(monitoringConfiguration.managedPersistenceMonitoringConfiguration()))
+                .build();
+    }
+
+    private static S3MonitoringConfiguration translate(software.amazon.awssdk.services.emrserverless.model.S3MonitoringConfiguration s3MonitoringConfiguration) {
+        return s3MonitoringConfiguration == null
+                ? null
+                : S3MonitoringConfiguration.builder()
+                .logUri(s3MonitoringConfiguration.logUri() == null ? null : s3MonitoringConfiguration.logUri())
+                .encryptionKeyArn(s3MonitoringConfiguration.encryptionKeyArn() == null ? null : s3MonitoringConfiguration.encryptionKeyArn())
+                .build();
+    }
+
+    private static ManagedPersistenceMonitoringConfiguration translate(software.amazon.awssdk.services.emrserverless.model.ManagedPersistenceMonitoringConfiguration managedPersistenceMonitoringConfiguration) {
+        return managedPersistenceMonitoringConfiguration == null
+                ? null
+                : ManagedPersistenceMonitoringConfiguration.builder()
+                .enabled(managedPersistenceMonitoringConfiguration.enabled() == null ? null : managedPersistenceMonitoringConfiguration.enabled())
+                .encryptionKeyArn(managedPersistenceMonitoringConfiguration.encryptionKeyArn() == null ? null : managedPersistenceMonitoringConfiguration.encryptionKeyArn())
+                .build();
+    }
+
+
+    private static Set<ConfigurationObject> translate(List<software.amazon.awssdk.services.emrserverless.model.Configuration> configurationList) {
+        return configurationList == null
+                ? null
+                : configurationList.stream().map(Translator::translate)
+                .collect(Collectors.toSet());
+    }
+
+    private static ConfigurationObject translate(software.amazon.awssdk.services.emrserverless.model.Configuration configuration) {
+        List<ConfigurationObject> configurationList = configuration.configurations() == null ? null : configuration.configurations()
+                .stream().map(Translator::translate)
+                .collect(Collectors.toList());
+        return ConfigurationObject.builder()
+                .classification(configuration.classification() == null ? null : configuration.classification())
+                .properties(configuration.properties() == null ? null : configuration.properties())
+                .configurations(configurationList == null ? null : configurationList.stream().collect(Collectors.toSet()))
+                .build();
     }
 
     /**
@@ -387,20 +435,24 @@ public class Translator {
      */
     static CreateApplicationRequest translateToCreateRequest(final ResourceModel model, ResourceHandlerRequest<ResourceModel> request) {
         return CreateApplicationRequest.builder()
-            .releaseLabel(model.getReleaseLabel())
-            .clientToken(request.getClientRequestToken())
-            .type(model.getType())
-            .name(model.getName())
-            .autoStartConfiguration(translate(model.getAutoStartConfiguration()))
-            .autoStopConfiguration(translate(model.getAutoStopConfiguration()))
-            .initialCapacity(translate(model.getInitialCapacity()))
-            .maximumCapacity(translate(model.getMaximumCapacity()))
-            .networkConfiguration(translate(model.getNetworkConfiguration()))
-            .tags(TagHelper.generateTagsForCreate(model, request))
-            .architecture(translate(model.getArchitecture()))
-            .imageConfiguration(translate(model.getImageConfiguration()))
-            .workerTypeSpecifications(translateToWorkerTypeSpecMap(model.getWorkerTypeSpecifications()))
-            .build();
+                .releaseLabel(model.getReleaseLabel())
+                .clientToken(request.getClientRequestToken())
+                .type(model.getType())
+                .name(model.getName())
+                .autoStartConfiguration(translate(model.getAutoStartConfiguration()))
+                .autoStopConfiguration(translate(model.getAutoStopConfiguration()))
+                .initialCapacity(translate(model.getInitialCapacity()))
+                .maximumCapacity(translate(model.getMaximumCapacity()))
+                .networkConfiguration(translate(model.getNetworkConfiguration()))
+                .tags(TagHelper.generateTagsForCreate(model, request))
+                .architecture(translate(model.getArchitecture()))
+                .imageConfiguration(translate(model.getImageConfiguration()))
+                .workerTypeSpecifications(translateToWorkerTypeSpecMap(model.getWorkerTypeSpecifications()))
+                .monitoringConfiguration(translate(model.getMonitoringConfiguration()))
+                .runtimeConfiguration(model.getRuntimeConfiguration() == null ? null:
+                        model.getRuntimeConfiguration().stream().map(Translator::translate)
+                                .collect(Collectors.toList()))
+                .build();
     }
 
     private static Architecture translate(String architecture) {
@@ -481,17 +533,62 @@ public class Translator {
     static UpdateApplicationRequest translateToUpdateRequest(final ResourceModel model,
                                                              final ResourceHandlerRequest<ResourceModel> request) {
         return UpdateApplicationRequest.builder()
-            .applicationId(model.getApplicationId())
-            .clientToken(request.getClientRequestToken())
-            .autoStartConfiguration(translate(model.getAutoStartConfiguration()))
-            .autoStopConfiguration(translate(model.getAutoStopConfiguration()))
-            .initialCapacity(translate(model.getInitialCapacity()))
-            .maximumCapacity(translate(model.getMaximumCapacity()))
-            .networkConfiguration(translate(model.getNetworkConfiguration()))
-            .architecture(translate(model.getArchitecture()))
-            .imageConfiguration(translate(model.getImageConfiguration()))
-            .workerTypeSpecifications(translateToWorkerTypeSpecMap(model.getWorkerTypeSpecifications()))
-            .build();
+                .applicationId(model.getApplicationId())
+                .releaseLabel(model.getReleaseLabel())
+                .clientToken(request.getClientRequestToken())
+                .autoStartConfiguration(translate(model.getAutoStartConfiguration()))
+                .autoStopConfiguration(translate(model.getAutoStopConfiguration()))
+                .initialCapacity(translate(model.getInitialCapacity()))
+                .maximumCapacity(translate(model.getMaximumCapacity()))
+                .networkConfiguration(translate(model.getNetworkConfiguration()))
+                .architecture(translate(model.getArchitecture()))
+                .imageConfiguration(translate(model.getImageConfiguration()))
+                .workerTypeSpecifications(translateToWorkerTypeSpecMap(model.getWorkerTypeSpecifications()))
+                .monitoringConfiguration(translate(model.getMonitoringConfiguration()))
+                .runtimeConfiguration(model.getRuntimeConfiguration() == null ? null:
+                        model.getRuntimeConfiguration().stream().map(Translator::translate)
+                                .collect(Collectors.toList()))
+                .build();
+    }
+
+    private static software.amazon.awssdk.services.emrserverless.model.Configuration translate(ConfigurationObject configuration) {
+        List<software.amazon.awssdk.services.emrserverless.model.Configuration> configurationList = configuration.getConfigurations() == null ? null :
+                configuration.getConfigurations().stream().map(Translator::translate)
+                        .collect(Collectors.toList());
+        return configuration == null ? null :
+                software.amazon.awssdk.services.emrserverless.model.Configuration.builder()
+                        .properties(configuration.getProperties() == null ? null : configuration.getProperties())
+                        .classification(configuration.getClassification() == null ? null : configuration.getClassification())
+                        .configurations(configurationList == null ? null : configurationList.stream().collect(Collectors.toSet()))
+                        .build();
+    }
+
+    private static software.amazon.awssdk.services.emrserverless.model.MonitoringConfiguration translate(MonitoringConfiguration monitoringConfiguration) {
+        return monitoringConfiguration == null
+                ? null
+                : software.amazon.awssdk.services.emrserverless.model.MonitoringConfiguration.builder()
+                .s3MonitoringConfiguration(translate(monitoringConfiguration.getS3MonitoringConfiguration()))
+                .managedPersistenceMonitoringConfiguration(translate(monitoringConfiguration.getManagedPersistenceMonitoringConfiguration()))
+                .build();
+    }
+
+
+    private static software.amazon.awssdk.services.emrserverless.model.S3MonitoringConfiguration translate(S3MonitoringConfiguration s3MonitoringConfiguration) {
+        return s3MonitoringConfiguration == null
+                ? null
+                : software.amazon.awssdk.services.emrserverless.model.S3MonitoringConfiguration.builder()
+                .logUri(s3MonitoringConfiguration.getLogUri() == null ? null : s3MonitoringConfiguration.getLogUri())
+                .encryptionKeyArn(s3MonitoringConfiguration.getEncryptionKeyArn() == null ? null : s3MonitoringConfiguration.getEncryptionKeyArn())
+                .build();
+    }
+
+    private static software.amazon.awssdk.services.emrserverless.model.ManagedPersistenceMonitoringConfiguration translate(ManagedPersistenceMonitoringConfiguration managedPersistenceMonitoringConfiguration) {
+        return managedPersistenceMonitoringConfiguration == null
+                ? null
+                : software.amazon.awssdk.services.emrserverless.model.ManagedPersistenceMonitoringConfiguration.builder()
+                .enabled(managedPersistenceMonitoringConfiguration.getEnabled() == null ? null : managedPersistenceMonitoringConfiguration.getEnabled())
+                .encryptionKeyArn(managedPersistenceMonitoringConfiguration.getEncryptionKeyArn() == null ? null : managedPersistenceMonitoringConfiguration.getEncryptionKeyArn())
+                .build();
     }
 
     /**

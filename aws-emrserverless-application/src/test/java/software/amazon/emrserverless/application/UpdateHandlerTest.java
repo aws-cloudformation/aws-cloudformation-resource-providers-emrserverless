@@ -10,15 +10,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.stream.Stream;
 
+import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.Arguments;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -30,9 +34,12 @@ import software.amazon.awssdk.services.emrserverless.model.Application;
 import software.amazon.awssdk.services.emrserverless.model.ApplicationState;
 import software.amazon.awssdk.services.emrserverless.model.AutoStartConfig;
 import software.amazon.awssdk.services.emrserverless.model.AutoStopConfig;
+import software.amazon.awssdk.services.emrserverless.model.Configuration;
 import software.amazon.awssdk.services.emrserverless.model.GetApplicationRequest;
 import software.amazon.awssdk.services.emrserverless.model.GetApplicationResponse;
 import software.amazon.awssdk.services.emrserverless.model.InternalServerException;
+import software.amazon.awssdk.services.emrserverless.model.ManagedPersistenceMonitoringConfiguration;
+import software.amazon.awssdk.services.emrserverless.model.S3MonitoringConfiguration;
 import software.amazon.awssdk.services.emrserverless.model.TagResourceRequest;
 import software.amazon.awssdk.services.emrserverless.model.TagResourceResponse;
 import software.amazon.awssdk.services.emrserverless.model.UntagResourceRequest;
@@ -66,6 +73,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
         "tag-key-3", "tag-value-3"
     );
     private static final String UPDATE_OPERATION = "UpdateApplication";
+    private static final String UPDATED_RELEASE_LABEL = "spark-6.10.0-preview";
 
     @Mock
     private AmazonWebServicesClientProxy proxy;
@@ -119,6 +127,116 @@ public class UpdateHandlerTest extends AbstractTestBase {
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModel()).isEqualTo(model);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+    }
+
+    private Stream<Arguments> provideApplicationWithApplicationConfiguration() {
+        return Stream.of(
+                Arguments.of(getDefaultApplicationBuilder()
+                                .state(ApplicationState.CREATED)
+                        .monitoringConfiguration(software.amazon.awssdk.services.emrserverless.model.MonitoringConfiguration.builder()
+                                .s3MonitoringConfiguration(software.amazon.awssdk.services.emrserverless.model.S3MonitoringConfiguration
+                                        .builder().encryptionKeyArn(null)
+                                        .logUri(null)
+                                        .build())
+                                .managedPersistenceMonitoringConfiguration(software.amazon.awssdk.services.emrserverless.model
+                                        .ManagedPersistenceMonitoringConfiguration.builder()
+                                        .enabled(null)
+                                        .encryptionKeyArn(null).build())
+                                .build())
+                        .runtimeConfiguration(Sets.newHashSet(software.amazon.awssdk.services.emrserverless.model.Configuration.builder()
+                                .classification(null)
+                                .properties(null)
+                                .configurations((Collection<Configuration>) null)
+                                .build()))
+                        .build()),
+                Arguments.of(getDefaultApplicationBuilder()
+                        .state(ApplicationState.CREATED)
+                        .monitoringConfiguration(software.amazon.awssdk.services.emrserverless.model.MonitoringConfiguration.builder()
+                                .s3MonitoringConfiguration((S3MonitoringConfiguration) null)
+                                .managedPersistenceMonitoringConfiguration((ManagedPersistenceMonitoringConfiguration) null)
+                                .build())
+                        .runtimeConfiguration(Sets.newHashSet())
+                        .build())
+        );
+    }
+
+    @MethodSource("provideApplicationWithApplicationConfiguration")
+    @ParameterizedTest
+    public void handleRequest_SuccessWithApplicationConfiguration(Application application) {
+        UpdateApplicationResponse updateApplicationResponse = updateApplicationResponse();
+        GetApplicationResponse initialApplicationResponse = getApplicationResponse(getApplication(ApplicationState.CREATED, INITIAL_APPLICATION_TAGS));
+        GetApplicationResponse postUpdateApplicationResponse = getApplicationResponse(application);
+
+        when(sdkClient.updateApplication(any(UpdateApplicationRequest.class)))
+                .thenReturn(updateApplicationResponse);
+        when(sdkClient.getApplication(any(GetApplicationRequest.class)))
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(postUpdateApplicationResponse);
+        when(sdkClient.tagResource(any(TagResourceRequest.class)))
+                .thenReturn(TagResourceResponse.builder().build());
+        when(sdkClient.untagResource(any(UntagResourceRequest.class)))
+                .thenReturn(UntagResourceResponse.builder().build());
+
+        final ResourceModel model = Translator.translateFromReadResponse(postUpdateApplicationResponse);
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceTags(DESIRED_APPLICATION_TAGS)
+                .desiredResourceState(model)
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = updateHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        assertThat(response).isNotNull();
+        verify(sdkClient).updateApplication(any(UpdateApplicationRequest.class));
+        verify(sdkClient).tagResource(any(TagResourceRequest.class));
+        verify(sdkClient).untagResource(any(UntagResourceRequest.class));
+        verify(sdkClient, times(3)).getApplication(any(GetApplicationRequest.class));
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(model);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handleRequest_SuccessWithUpdatedReleaseLabel() {
+        UpdateApplicationResponse updateApplicationResponse = updateApplicationResponse();
+        GetApplicationResponse initialApplicationResponse =
+                getApplicationResponse(getApplication(ApplicationState.CREATED, Collections.emptyMap()));
+        GetApplicationResponse postUpdateApplicationResponse =
+                getApplicationResponse(getApplicationWithUpdatedReleaseLabel(ApplicationState.CREATED,
+                        Collections.emptyMap()));
+
+        when(sdkClient.updateApplication(any(UpdateApplicationRequest.class)))
+                .thenReturn(updateApplicationResponse);
+        when(sdkClient.getApplication(any(GetApplicationRequest.class)))
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(initialApplicationResponse)
+                .thenReturn(postUpdateApplicationResponse);
+        final ResourceModel model = ResourceModel.builder()
+                .arn(APPLICATION_ARN)
+                .applicationId(APPLICATION_ID)
+                .build();
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .desiredResourceTags(Collections.emptyMap())
+                .build();
+
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+                updateHandler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        assertThat(response).isNotNull();
+        verify(sdkClient).updateApplication(any(UpdateApplicationRequest.class));
+        verify(sdkClient, never()).tagResource(any(TagResourceRequest.class));
+        verify(sdkClient, never()).untagResource(any(UntagResourceRequest.class));
+        verify(sdkClient, times(3)).getApplication(any(GetApplicationRequest.class));
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel()).isEqualTo(getResourceModel(APPLICATION_ID, Collections.emptyMap(), UPDATED_RELEASE_LABEL));
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
