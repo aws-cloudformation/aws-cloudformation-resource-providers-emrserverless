@@ -11,7 +11,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 {
     "<a href="#s3monitoringconfiguration" title="S3MonitoringConfiguration">S3MonitoringConfiguration</a>" : <i><a href="s3monitoringconfiguration.md">S3MonitoringConfiguration</a></i>,
-    "<a href="#managedpersistencemonitoringconfiguration" title="ManagedPersistenceMonitoringConfiguration">ManagedPersistenceMonitoringConfiguration</a>" : <i><a href="managedpersistencemonitoringconfiguration.md">ManagedPersistenceMonitoringConfiguration</a></i>
+    "<a href="#managedpersistencemonitoringconfiguration" title="ManagedPersistenceMonitoringConfiguration">ManagedPersistenceMonitoringConfiguration</a>" : <i><a href="managedpersistencemonitoringconfiguration.md">ManagedPersistenceMonitoringConfiguration</a></i>,
+    "<a href="#cloudwatchloggingconfiguration" title="CloudWatchLoggingConfiguration">CloudWatchLoggingConfiguration</a>" : <i><a href="cloudwatchloggingconfiguration.md">CloudWatchLoggingConfiguration</a></i>
 }
 </pre>
 
@@ -20,6 +21,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 <a href="#s3monitoringconfiguration" title="S3MonitoringConfiguration">S3MonitoringConfiguration</a>: <i><a href="s3monitoringconfiguration.md">S3MonitoringConfiguration</a></i>
 <a href="#managedpersistencemonitoringconfiguration" title="ManagedPersistenceMonitoringConfiguration">ManagedPersistenceMonitoringConfiguration</a>: <i><a href="managedpersistencemonitoringconfiguration.md">ManagedPersistenceMonitoringConfiguration</a></i>
+<a href="#cloudwatchloggingconfiguration" title="CloudWatchLoggingConfiguration">CloudWatchLoggingConfiguration</a>: <i><a href="cloudwatchloggingconfiguration.md">CloudWatchLoggingConfiguration</a></i>
 </pre>
 
 ## Properties
@@ -37,6 +39,14 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 _Required_: No
 
 _Type_: <a href="managedpersistencemonitoringconfiguration.md">ManagedPersistenceMonitoringConfiguration</a>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### CloudWatchLoggingConfiguration
+
+_Required_: No
+
+_Type_: <a href="cloudwatchloggingconfiguration.md">CloudWatchLoggingConfiguration</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

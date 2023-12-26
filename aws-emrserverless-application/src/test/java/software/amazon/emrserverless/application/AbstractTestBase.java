@@ -5,6 +5,7 @@ import java.time.Period;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -188,6 +189,13 @@ public abstract class AbstractTestBase {
                                 .builder().encryptionKeyArn("ENCRYPTION_KEY")
                                 .logUri("s3://98")
                                 .build())
+                        .cloudWatchLoggingConfiguration(software.amazon.awssdk.services.emrserverless.model
+                                .CloudWatchLoggingConfiguration.builder()
+                                .enabled(Boolean.TRUE)
+                                .logGroupName("logGroup")
+                                .logStreamNamePrefix("logStreamPrefix")
+                                .logTypes(Map.of("SPARK_DRIVER", List.of("STDERR", "STDOUT")))
+                                .encryptionKeyArn("ENCRYPTION_KEY").build())
                         .managedPersistenceMonitoringConfiguration(software.amazon.awssdk.services.emrserverless.model
                                 .ManagedPersistenceMonitoringConfiguration.builder()
                                 .enabled(Boolean.TRUE)
@@ -272,6 +280,16 @@ public abstract class AbstractTestBase {
                                 .encryptionKeyArn("ENCRYPTION_KEY")
                                 .logUri("s3://98")
                                 .build())
+                        .cloudWatchLoggingConfiguration(software.amazon.emrserverless.application
+                                .CloudWatchLoggingConfiguration.builder()
+                                .enabled(Boolean.TRUE)
+                                .logGroupName("logGroup")
+                                .logTypeMap(Set.of(LogTypeMapKeyValuePair.builder()
+                                        .key("SPARK_DRIVER")
+                                        .value(Set.of("STDERR", "STDOUT"))
+                                        .build()))
+                                .logStreamNamePrefix("logStreamPrefix")
+                                .encryptionKeyArn("ENCRYPTION_KEY").build())
                         .managedPersistenceMonitoringConfiguration(software.amazon.emrserverless.application.ManagedPersistenceMonitoringConfiguration
                                 .builder()
                                 .enabled(Boolean.TRUE)

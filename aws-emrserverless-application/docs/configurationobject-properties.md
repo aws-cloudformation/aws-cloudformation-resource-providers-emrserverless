@@ -8,19 +8,19 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "<a href="#^[a-za-z]+[-_]*[a-za-z]+$" title="^[a-zA-Z]+[-_]*[a-zA-Z]+$">^[a-zA-Z]+[-_]*[a-zA-Z]+$</a>" : <i>String</i>
+    "<a href="#^[a-za-z]+[-a-za-z0-9_.]*$" title="^[a-zA-Z]+[-a-zA-Z0-9_.]*$">^[a-zA-Z]+[-a-zA-Z0-9_.]*$</a>" : <i>String</i>
 }
 </pre>
 
 ### YAML
 
 <pre>
-<a href="#^[a-za-z]+[-_]*[a-za-z]+$" title="^[a-zA-Z]+[-_]*[a-zA-Z]+$">^[a-zA-Z]+[-_]*[a-zA-Z]+$</a>: <i>String</i>
+<a href="#^[a-za-z]+[-a-za-z0-9_.]*$" title="^[a-zA-Z]+[-a-zA-Z0-9_.]*$">^[a-zA-Z]+[-a-zA-Z0-9_.]*$</a>: <i>String</i>
 </pre>
 
 ## Properties
 
-#### \^[a-zA-Z]+[-_]*[a-zA-Z]+$
+#### \^[a-zA-Z]+[-a-zA-Z0-9_.]*$
 
 _Required_: No
 
