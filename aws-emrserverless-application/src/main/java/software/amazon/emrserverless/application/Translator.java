@@ -1,12 +1,15 @@
 package software.amazon.emrserverless.application;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -224,6 +227,7 @@ public class Translator {
                 : MonitoringConfiguration.builder()
                 .s3MonitoringConfiguration(translate(monitoringConfiguration.s3MonitoringConfiguration()))
                 .managedPersistenceMonitoringConfiguration(translate(monitoringConfiguration.managedPersistenceMonitoringConfiguration()))
+                .cloudWatchLoggingConfiguration(translate(monitoringConfiguration.cloudWatchLoggingConfiguration()))
                 .build();
     }
 
@@ -244,6 +248,37 @@ public class Translator {
                 .encryptionKeyArn(managedPersistenceMonitoringConfiguration.encryptionKeyArn() == null ? null : managedPersistenceMonitoringConfiguration.encryptionKeyArn())
                 .build();
     }
+
+    private static CloudWatchLoggingConfiguration translate(software.amazon.awssdk.services.emrserverless.model.CloudWatchLoggingConfiguration cloudWatchLoggingConfiguration) {
+        return cloudWatchLoggingConfiguration == null
+                ? null
+                : CloudWatchLoggingConfiguration.builder()
+                .enabled(cloudWatchLoggingConfiguration.enabled() == null ? null : cloudWatchLoggingConfiguration.enabled())
+                .encryptionKeyArn(cloudWatchLoggingConfiguration.encryptionKeyArn() == null ? null : cloudWatchLoggingConfiguration.encryptionKeyArn())
+                .logGroupName(cloudWatchLoggingConfiguration.logGroupName() == null ? null : cloudWatchLoggingConfiguration.logGroupName())
+                .logStreamNamePrefix(cloudWatchLoggingConfiguration.logStreamNamePrefix() == null ? null : cloudWatchLoggingConfiguration.logStreamNamePrefix())
+                .logTypeMap(cloudWatchLoggingConfiguration.logTypes() == null ? null : translateMap(cloudWatchLoggingConfiguration.logTypes()))
+                .build();
+    }
+
+    private static Set<LogTypeMapKeyValuePair> translateMap(Map<String, List<String>> logTypeMap) {
+        return logTypeMap == null
+                ? null
+                : logTypeMap.entrySet()
+                .stream()
+                .map(entry -> {
+                    if (entry.getKey() == null || entry.getValue() == null) {
+                        return null;
+                    }
+                    return LogTypeMapKeyValuePair.builder()
+                            .key(entry.getKey())
+                            .value(entry.getValue().stream().collect(Collectors.toSet()))
+                            .build();
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
 
 
     private static Set<ConfigurationObject> translate(List<software.amazon.awssdk.services.emrserverless.model.Configuration> configurationList) {
@@ -569,6 +604,7 @@ public class Translator {
                 : software.amazon.awssdk.services.emrserverless.model.MonitoringConfiguration.builder()
                 .s3MonitoringConfiguration(translate(monitoringConfiguration.getS3MonitoringConfiguration()))
                 .managedPersistenceMonitoringConfiguration(translate(monitoringConfiguration.getManagedPersistenceMonitoringConfiguration()))
+                .cloudWatchLoggingConfiguration(translate(monitoringConfiguration.getCloudWatchLoggingConfiguration()))
                 .build();
     }
 
@@ -589,6 +625,29 @@ public class Translator {
                 .enabled(managedPersistenceMonitoringConfiguration.getEnabled() == null ? null : managedPersistenceMonitoringConfiguration.getEnabled())
                 .encryptionKeyArn(managedPersistenceMonitoringConfiguration.getEncryptionKeyArn() == null ? null : managedPersistenceMonitoringConfiguration.getEncryptionKeyArn())
                 .build();
+    }
+
+    private static software.amazon.awssdk.services.emrserverless.model.CloudWatchLoggingConfiguration translate(CloudWatchLoggingConfiguration cloudWatchLoggingConfiguration) {
+        return cloudWatchLoggingConfiguration == null
+                ? null
+                : software.amazon.awssdk.services.emrserverless.model.CloudWatchLoggingConfiguration.builder()
+                .enabled(cloudWatchLoggingConfiguration.getEnabled() == null ? null : cloudWatchLoggingConfiguration.getEnabled())
+                .encryptionKeyArn(cloudWatchLoggingConfiguration.getEncryptionKeyArn() == null ? null : cloudWatchLoggingConfiguration.getEncryptionKeyArn())
+                .logGroupName(cloudWatchLoggingConfiguration.getLogGroupName() == null ? null : cloudWatchLoggingConfiguration.getLogGroupName())
+                .logStreamNamePrefix(cloudWatchLoggingConfiguration.getLogStreamNamePrefix() == null ? null : cloudWatchLoggingConfiguration.getLogStreamNamePrefix())
+                .logTypes(cloudWatchLoggingConfiguration.getLogTypeMap() == null ? null : translateMap(cloudWatchLoggingConfiguration.getLogTypeMap()))
+                .build();
+    }
+
+    private static Map<String, List<String>> translateMap(Set<LogTypeMapKeyValuePair> logTypeMap) {
+        return logTypeMap == null
+                ? null
+                : logTypeMap.stream()
+                .filter(logType -> logType.getKey() != null && logType.getValue() != null)
+                .collect(Collectors.toMap(
+                        LogTypeMapKeyValuePair::getKey,
+                        logType -> new ArrayList<>(logType.getValue())
+                ));
     }
 
     /**

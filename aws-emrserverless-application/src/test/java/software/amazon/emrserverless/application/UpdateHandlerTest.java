@@ -145,6 +145,9 @@ public class UpdateHandlerTest extends AbstractTestBase {
                                         .ManagedPersistenceMonitoringConfiguration.builder()
                                         .enabled(null)
                                         .encryptionKeyArn(null).build())
+                                .cloudWatchLoggingConfiguration(software.amazon.awssdk.services.emrserverless.model
+                                        .CloudWatchLoggingConfiguration.builder()
+                                        .build())
                                 .build())
                         .runtimeConfiguration(Sets.newHashSet(software.amazon.awssdk.services.emrserverless.model.Configuration.builder()
                                 .classification(null)
