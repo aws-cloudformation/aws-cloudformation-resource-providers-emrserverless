@@ -10,7 +10,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "<a href="#cpu" title="Cpu">Cpu</a>" : <i>String</i>,
     "<a href="#memory" title="Memory">Memory</a>" : <i>String</i>,
-    "<a href="#disk" title="Disk">Disk</a>" : <i>String</i>
+    "<a href="#disk" title="Disk">Disk</a>" : <i>String</i>,
+    "<a href="#diskType" title="DiskType">DiskType</a>" : <i>String</i>
 }
 </pre>
 
@@ -20,6 +21,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <a href="#cpu" title="Cpu">Cpu</a>: <i>String</i>
 <a href="#memory" title="Memory">Memory</a>: <i>String</i>
 <a href="#disk" title="Disk">Disk</a>: <i>String</i>
+<a href="#diskType" title="DiskType">DiskType</a> : <i>String</i>
 </pre>
 
 ## Properties
@@ -69,6 +71,18 @@ _Minimum Length_: <code>1</code>
 _Maximum Length_: <code>15</code>
 
 _Pattern_: <code>^[1-9][0-9]*(\s)?(GB|gb|gB|Gb)$</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### DiskType
+
+Per worker DiskType resource. Shuffle optimized and Standard are only supported types and specifying diskType is optional
+
+_Required_: No
+
+_Type_: String
+
+_Pattern_: <code>^(SHUFFLE_OPTIMIZED|[Ss]huffle_[Oo]ptimized|STANDARD|[Ss]tandard)$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

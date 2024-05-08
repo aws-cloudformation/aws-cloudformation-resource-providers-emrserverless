@@ -71,6 +71,7 @@ public abstract class AbstractTestBase {
     private static final String MAX_CPU = "max-cpu";
     private static final String MAX_DISK = "max-disk";
     private static final String MAX_MEMORY = "max-memory";
+    private static final String CUSTOM_DISK_TYPE = "SHUFFLE_OPTIMIZED";
     private static final Set<String> SUBNETS = ImmutableSet.of("subnet-1", "subnet-2", "subnet-3");
     private static final Set<String> SECURITY_GROUPS =
         ImmutableSet.of("sg-1", "sg-2", "sg-3", "sg-4", "sg-5");
@@ -168,6 +169,7 @@ public abstract class AbstractTestBase {
                                         .workerConfiguration(WorkerResourceConfig.builder()
                                                 .cpu(DRIVER_CPU)
                                                 .disk(DRIVER_DISK)
+                                                .diskType(CUSTOM_DISK_TYPE)
                                                 .memory(DRIVER_MEMORY)
                                                 .build())
                                         .build())
@@ -176,6 +178,7 @@ public abstract class AbstractTestBase {
                                         .workerConfiguration(WorkerResourceConfig.builder()
                                                 .cpu(EXECUTOR_CPU)
                                                 .disk(EXECUTOR_DISK)
+                                                .diskType(CUSTOM_DISK_TYPE)
                                                 .memory(EXECUTOR_MEMORY)
                                                 .build())
                                         .build())
@@ -308,6 +311,7 @@ public abstract class AbstractTestBase {
                                         .workerConfiguration(WorkerConfiguration.builder()
                                                 .cpu(DRIVER_CPU)
                                                 .disk(DRIVER_DISK)
+                                                .diskType(CUSTOM_DISK_TYPE)
                                                 .memory(DRIVER_MEMORY)
                                                 .build())
                                         .build())
@@ -319,6 +323,7 @@ public abstract class AbstractTestBase {
                                         .workerConfiguration(WorkerConfiguration.builder()
                                                 .cpu(EXECUTOR_CPU)
                                                 .disk(EXECUTOR_DISK)
+                                                .diskType(CUSTOM_DISK_TYPE)
                                                 .memory(EXECUTOR_MEMORY)
                                                 .build())
                                         .build())

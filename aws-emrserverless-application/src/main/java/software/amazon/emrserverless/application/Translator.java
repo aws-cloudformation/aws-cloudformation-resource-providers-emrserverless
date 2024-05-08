@@ -100,6 +100,7 @@ public class Translator {
                 .cpu(config.getCpu())
                 .memory(config.getMemory())
                 .disk(config.getDisk())
+                .diskType(config.getDiskType())
                 .build())
             .orElse(null);
     }
@@ -348,6 +349,7 @@ public class Translator {
                 .cpu(config.cpu())
                 .memory(config.memory())
                 .disk(config.disk())
+                .diskType(config.getDiskType())
                 .build())
             .orElse(null);
     }
