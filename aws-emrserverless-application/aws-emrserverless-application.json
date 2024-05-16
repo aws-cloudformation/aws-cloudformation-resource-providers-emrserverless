@@ -200,6 +200,10 @@
         "Disk": {
           "description": "Per worker Disk resource. GB is the only supported unit and specifying GB is optional",
           "$ref": "#/definitions/DiskSize"
+        },
+        "DiskType": {
+          "description": "Per worker DiskType resource. Shuffle optimized and Standard are only supported types and specifying diskType is optional",
+          "$ref": "#/definitions/DiskType"
         }
       },
       "required": [
@@ -432,6 +436,11 @@
       "minLength": 1,
       "maxLength": 15,
       "pattern": "^[1-9][0-9]*(\\s)?(GB|gb|gB|Gb)$"
+    },
+    "DiskType": {
+      "description": "Per worker DiskType resource. Shuffle optimized and Standard are only supported types and specifying diskType is optional",
+      "type": "string",
+      "pattern": "^(SHUFFLE_OPTIMIZED|[Ss]huffle_[Oo]ptimized|STANDARD|[Ss]tandard)$"
     },
     "WorkerTypeSpecificationInput": {
       "type": "object",
