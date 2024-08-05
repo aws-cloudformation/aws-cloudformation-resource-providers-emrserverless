@@ -187,6 +187,10 @@ public abstract class AbstractTestBase {
                         .imageUri(IMAGE_URI)
                         .resolvedImageDigest(IMAGE_DIGEST)
                         .build())
+                .interactiveConfiguration(software.amazon.awssdk.services.emrserverless.model.InteractiveConfiguration.builder()
+                        .studioEnabled(Boolean.FALSE)
+                        .livyEndpointEnabled(Boolean.TRUE)
+                        .build())
                 .monitoringConfiguration(software.amazon.awssdk.services.emrserverless.model.MonitoringConfiguration.builder()
                         .s3MonitoringConfiguration(software.amazon.awssdk.services.emrserverless.model.S3MonitoringConfiguration
                                 .builder().encryptionKeyArn("ENCRYPTION_KEY")
@@ -275,6 +279,10 @@ public abstract class AbstractTestBase {
                         .build())
                 .imageConfiguration(ImageConfigurationInput.builder()
                         .imageUri(IMAGE_URI)
+                        .build())
+                .interactiveConfiguration(InteractiveConfiguration.builder()
+                        .studioEnabled(Boolean.FALSE)
+                        .livyEndpointEnabled(Boolean.TRUE)
                         .build())
                 .monitoringConfiguration(MonitoringConfiguration
                         .builder()

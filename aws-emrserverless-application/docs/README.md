@@ -24,6 +24,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#imageconfiguration" title="ImageConfiguration">ImageConfiguration</a>" : <i><a href="imageconfigurationinput.md">ImageConfigurationInput</a></i>,
         "<a href="#monitoringconfiguration" title="MonitoringConfiguration">MonitoringConfiguration</a>" : <i><a href="monitoringconfiguration.md">MonitoringConfiguration</a></i>,
         "<a href="#runtimeconfiguration" title="RuntimeConfiguration">RuntimeConfiguration</a>" : <i>[ <a href="configurationobject.md">ConfigurationObject</a>, ... ]</i>,
+        "<a href="#interactiveconfiguration" title="InteractiveConfiguration">InteractiveConfiguration</a>" : <i><a href="interactiveconfiguration.md">InteractiveConfiguration</a></i>,
         "<a href="#networkconfiguration" title="NetworkConfiguration">NetworkConfiguration</a>" : <i><a href="networkconfiguration.md">NetworkConfiguration</a></i>,
         "<a href="#workertypespecifications" title="WorkerTypeSpecifications">WorkerTypeSpecifications</a>" : <i><a href="workertypespecifications.md">WorkerTypeSpecifications</a></i>
     }
@@ -50,6 +51,7 @@ Properties:
     <a href="#monitoringconfiguration" title="MonitoringConfiguration">MonitoringConfiguration</a>: <i><a href="monitoringconfiguration.md">MonitoringConfiguration</a></i>
     <a href="#runtimeconfiguration" title="RuntimeConfiguration">RuntimeConfiguration</a>: <i>
       - <a href="configurationobject.md">ConfigurationObject</a></i>
+    <a href="#interactiveconfiguration" title="InteractiveConfiguration">InteractiveConfiguration</a>: <i><a href="interactiveconfiguration.md">InteractiveConfiguration</a></i>
     <a href="#networkconfiguration" title="NetworkConfiguration">NetworkConfiguration</a>: <i><a href="networkconfiguration.md">NetworkConfiguration</a></i>
     <a href="#workertypespecifications" title="WorkerTypeSpecifications">WorkerTypeSpecifications</a>: <i><a href="workertypespecifications.md">WorkerTypeSpecifications</a></i>
 </pre>
@@ -183,6 +185,14 @@ Runtime configuration for batch and interactive JobRun.
 _Required_: No
 
 _Type_: List of <a href="configurationobject.md">ConfigurationObject</a>
+
+_Update requires_: [Some interruptions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-some-interrupt)
+
+#### InteractiveConfiguration
+
+_Required_: No
+
+_Type_: <a href="interactiveconfiguration.md">InteractiveConfiguration</a>
 
 _Update requires_: [Some interruptions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-some-interrupt)
 

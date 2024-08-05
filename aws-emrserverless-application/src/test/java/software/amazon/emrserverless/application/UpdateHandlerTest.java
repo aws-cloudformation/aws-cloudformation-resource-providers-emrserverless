@@ -154,6 +154,10 @@ public class UpdateHandlerTest extends AbstractTestBase {
                                 .properties(null)
                                 .configurations((Collection<Configuration>) null)
                                 .build()))
+                        .interactiveConfiguration(software.amazon.awssdk.services.emrserverless.model.InteractiveConfiguration.builder()
+                                .studioEnabled(null)
+                                .livyEndpointEnabled(null)
+                                .build())
                         .build()),
                 Arguments.of(getDefaultApplicationBuilder()
                         .state(ApplicationState.CREATED)

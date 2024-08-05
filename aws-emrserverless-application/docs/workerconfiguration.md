@@ -11,7 +11,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "<a href="#cpu" title="Cpu">Cpu</a>" : <i>String</i>,
     "<a href="#memory" title="Memory">Memory</a>" : <i>String</i>,
     "<a href="#disk" title="Disk">Disk</a>" : <i>String</i>,
-    "<a href="#diskType" title="DiskType">DiskType</a>" : <i>String</i>
+    "<a href="#disktype" title="DiskType">DiskType</a>" : <i>String</i>
 }
 </pre>
 
@@ -21,7 +21,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <a href="#cpu" title="Cpu">Cpu</a>: <i>String</i>
 <a href="#memory" title="Memory">Memory</a>: <i>String</i>
 <a href="#disk" title="Disk">Disk</a>: <i>String</i>
-<a href="#diskType" title="DiskType">DiskType</a> : <i>String</i>
+<a href="#disktype" title="DiskType">DiskType</a>: <i>String</i>
 </pre>
 
 ## Properties
