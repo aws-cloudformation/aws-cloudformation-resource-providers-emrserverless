@@ -194,6 +194,7 @@ public class Translator {
                         .workerTypeSpecifications(translateToRead(application.workerTypeSpecifications()))
                         .monitoringConfiguration(translate(application.monitoringConfiguration()))
                         .runtimeConfiguration(translate(application.runtimeConfiguration()))
+                        .interactiveConfiguration(translate(application.interactiveConfiguration()))
                         .build())
                 .orElse(null);
     }
@@ -220,6 +221,15 @@ public class Translator {
             : software.amazon.emrserverless.application.ImageConfigurationInput.builder()
             .imageUri(imageConfiguration.imageUri())
             .build();
+    }
+
+    private static InteractiveConfiguration translate(software.amazon.awssdk.services.emrserverless.model.InteractiveConfiguration interactiveConfiguration) {
+        return interactiveConfiguration == null
+                ? null
+                : InteractiveConfiguration.builder()
+                .studioEnabled(interactiveConfiguration.studioEnabled() == null ? null : interactiveConfiguration.studioEnabled())
+                .livyEndpointEnabled(interactiveConfiguration.livyEndpointEnabled() == null ? null : interactiveConfiguration.livyEndpointEnabled())
+                .build();
     }
 
     private static MonitoringConfiguration translate(software.amazon.awssdk.services.emrserverless.model.MonitoringConfiguration monitoringConfiguration) {
@@ -349,7 +359,7 @@ public class Translator {
                 .cpu(config.cpu())
                 .memory(config.memory())
                 .disk(config.disk())
-                .diskType(config.getDiskType())
+                .diskType(config.diskType())
                 .build())
             .orElse(null);
     }
@@ -489,6 +499,7 @@ public class Translator {
                 .runtimeConfiguration(model.getRuntimeConfiguration() == null ? null:
                         model.getRuntimeConfiguration().stream().map(Translator::translate)
                                 .collect(Collectors.toList()))
+                .interactiveConfiguration(translate(model.getInteractiveConfiguration()))
                 .build();
     }
 
@@ -586,6 +597,14 @@ public class Translator {
                         model.getRuntimeConfiguration().stream().map(Translator::translate)
                                 .collect(Collectors.toList()))
                 .build();
+    }
+
+    private static software.amazon.awssdk.services.emrserverless.model.InteractiveConfiguration translate(InteractiveConfiguration interactiveConfiguration) {
+        return interactiveConfiguration == null ? null :
+                software.amazon.awssdk.services.emrserverless.model.InteractiveConfiguration.builder()
+                        .studioEnabled(interactiveConfiguration.getStudioEnabled() == null ? null : interactiveConfiguration.getStudioEnabled())
+                        .livyEndpointEnabled(interactiveConfiguration.getLivyEndpointEnabled() == null ? null : interactiveConfiguration.getLivyEndpointEnabled())
+                        .build();
     }
 
     private static software.amazon.awssdk.services.emrserverless.model.Configuration translate(ConfigurationObject configuration) {
