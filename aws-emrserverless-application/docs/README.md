@@ -26,7 +26,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#runtimeconfiguration" title="RuntimeConfiguration">RuntimeConfiguration</a>" : <i>[ <a href="configurationobject.md">ConfigurationObject</a>, ... ]</i>,
         "<a href="#interactiveconfiguration" title="InteractiveConfiguration">InteractiveConfiguration</a>" : <i><a href="interactiveconfiguration.md">InteractiveConfiguration</a></i>,
         "<a href="#networkconfiguration" title="NetworkConfiguration">NetworkConfiguration</a>" : <i><a href="networkconfiguration.md">NetworkConfiguration</a></i>,
-        "<a href="#workertypespecifications" title="WorkerTypeSpecifications">WorkerTypeSpecifications</a>" : <i><a href="workertypespecifications.md">WorkerTypeSpecifications</a></i>
+        "<a href="#workertypespecifications" title="WorkerTypeSpecifications">WorkerTypeSpecifications</a>" : <i><a href="workertypespecifications.md">WorkerTypeSpecifications</a></i>,
+        "<a href="#schedulerconfiguration" title="SchedulerConfiguration">SchedulerConfiguration</a>" : <i><a href="schedulerconfiguration.md">SchedulerConfiguration</a></i>
     }
 }
 </pre>
@@ -54,6 +55,7 @@ Properties:
     <a href="#interactiveconfiguration" title="InteractiveConfiguration">InteractiveConfiguration</a>: <i><a href="interactiveconfiguration.md">InteractiveConfiguration</a></i>
     <a href="#networkconfiguration" title="NetworkConfiguration">NetworkConfiguration</a>: <i><a href="networkconfiguration.md">NetworkConfiguration</a></i>
     <a href="#workertypespecifications" title="WorkerTypeSpecifications">WorkerTypeSpecifications</a>: <i><a href="workertypespecifications.md">WorkerTypeSpecifications</a></i>
+    <a href="#schedulerconfiguration" title="SchedulerConfiguration">SchedulerConfiguration</a>: <i><a href="schedulerconfiguration.md">SchedulerConfiguration</a></i>
 </pre>
 
 ## Properties
@@ -212,6 +214,16 @@ _Type_: <a href="workertypespecifications.md">WorkerTypeSpecifications</a>
 
 _Update requires_: [Some interruptions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-some-interrupt)
 
+ #### SchedulerConfiguration
+  
+ The scheduler configuration for batch and streaming jobs running on this application. Supported with release labels emr-7.0.0 and above.
+  
+ _Required_: No
+  
+ _Type_: <a href="schedulerconfiguration.md">SchedulerConfiguration</a>
+  
+ _Update requires_: [Some interruptions](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-some-interrupt)
+ 
 ## Return Values
 
 ### Ref

@@ -191,6 +191,10 @@ public abstract class AbstractTestBase {
                         .studioEnabled(Boolean.FALSE)
                         .livyEndpointEnabled(Boolean.TRUE)
                         .build())
+                .schedulerConfiguration(software.amazon.awssdk.services.emrserverless.model.SchedulerConfiguration.builder()
+                     .queueTimeoutMinutes(120)
+                     .maxConcurrentRuns(15)
+                     .build())
                 .monitoringConfiguration(software.amazon.awssdk.services.emrserverless.model.MonitoringConfiguration.builder()
                         .s3MonitoringConfiguration(software.amazon.awssdk.services.emrserverless.model.S3MonitoringConfiguration
                                 .builder().encryptionKeyArn("ENCRYPTION_KEY")
@@ -283,6 +287,10 @@ public abstract class AbstractTestBase {
                 .interactiveConfiguration(InteractiveConfiguration.builder()
                         .studioEnabled(Boolean.FALSE)
                         .livyEndpointEnabled(Boolean.TRUE)
+                        .build())
+                .schedulerConfiguration(SchedulerConfiguration.builder()
+                        .queueTimeoutMinutes(120)
+                        .maxConcurrentRuns(15)
                         .build())
                 .monitoringConfiguration(MonitoringConfiguration
                         .builder()
