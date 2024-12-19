@@ -38,6 +38,7 @@ import software.amazon.awssdk.services.emrserverless.model.ValidationException;
 import software.amazon.awssdk.services.emrserverless.model.WorkerTypeSpecification;
 import software.amazon.awssdk.services.emrserverless.model.WorkerTypeSpecificationInput;
 import software.amazon.cloudformation.exceptions.BaseHandlerException;
+import software.amazon.cloudformation.exceptions.CfnAccessDeniedException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
@@ -46,6 +47,8 @@ import software.amazon.cloudformation.exceptions.CfnResourceConflictException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.exceptions.CfnServiceLimitExceededException;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import static software.amazon.emrserverless.application.BaseHandlerStd.ACCESS_DENIED_ERROR_CODE;
 
 /**
  * This class is a centralized placeholder for
@@ -195,8 +198,16 @@ public class Translator {
                         .monitoringConfiguration(translate(application.monitoringConfiguration()))
                         .runtimeConfiguration(translate(application.runtimeConfiguration()))
                         .interactiveConfiguration(translate(application.interactiveConfiguration()))
+                        .schedulerConfiguration(translate(application.schedulerConfiguration()))
                         .build())
                 .orElse(null);
+    }
+
+    private static SchedulerConfiguration translate(software.amazon.awssdk.services.emrserverless.model.SchedulerConfiguration schedulerConfiguration) {
+        return schedulerConfiguration == null ? null : SchedulerConfiguration.builder()
+            .queueTimeoutMinutes(schedulerConfiguration.queueTimeoutMinutes() == null ? null : schedulerConfiguration.queueTimeoutMinutes())
+            .maxConcurrentRuns(schedulerConfiguration.maxConcurrentRuns() == null ? null : schedulerConfiguration.maxConcurrentRuns())
+            .build();  
     }
 
     private static Map<String, software.amazon.emrserverless.application.WorkerTypeSpecificationInput> translateToRead(
@@ -460,11 +471,21 @@ public class Translator {
                     return StringUtils.isEmpty(resourceId)
                         ? new CfnResourceConflictException(e)
                         : new CfnResourceConflictException(ResourceModel.TYPE_NAME, resourceId, e.getMessage(), e);
+                } else if (StringUtils.equals(ACCESS_DENIED_ERROR_CODE,  getErrorCode(e))) {
+                    return new CfnAccessDeniedException(ResourceModel.TYPE_NAME, e);
                 } else {
                     return new CfnGeneralServiceException(operation, e);
                 }
             })
             .orElse(null);
+    }
+
+    private static String getErrorCode(Exception e) {
+        if (e instanceof EmrServerlessException && ((EmrServerlessException) e).awsErrorDetails() != null)
+        {
+            return ((EmrServerlessException) e).awsErrorDetails().errorCode();
+        }
+        return e.getMessage();
     }
 
     private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
@@ -500,6 +521,7 @@ public class Translator {
                         model.getRuntimeConfiguration().stream().map(Translator::translate)
                                 .collect(Collectors.toList()))
                 .interactiveConfiguration(translate(model.getInteractiveConfiguration()))
+                .schedulerConfiguration(translate(model.getSchedulerConfiguration()))
                 .build();
     }
 
@@ -596,7 +618,15 @@ public class Translator {
                 .runtimeConfiguration(model.getRuntimeConfiguration() == null ? null:
                         model.getRuntimeConfiguration().stream().map(Translator::translate)
                                 .collect(Collectors.toList()))
+                .schedulerConfiguration(translate(model.getSchedulerConfiguration()))         
                 .build();
+    }
+
+    private static software.amazon.awssdk.services.emrserverless.model.SchedulerConfiguration translate(SchedulerConfiguration schedulerConfiguration) {
+        return schedulerConfiguration == null ? null : software.amazon.awssdk.services.emrserverless.model.SchedulerConfiguration.builder()
+            .queueTimeoutMinutes(schedulerConfiguration.getQueueTimeoutMinutes() == null ? null : schedulerConfiguration.getQueueTimeoutMinutes())
+            .maxConcurrentRuns(schedulerConfiguration.getMaxConcurrentRuns() == null ? null : schedulerConfiguration.getMaxConcurrentRuns())
+            .build();
     }
 
     private static software.amazon.awssdk.services.emrserverless.model.InteractiveConfiguration translate(InteractiveConfiguration interactiveConfiguration) {

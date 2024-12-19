@@ -65,6 +65,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         ApplicationState.STOPPED,
         ApplicationState.STOPPING);
 
+    static  final String ACCESS_DENIED_ERROR_CODE = "AccessDeniedException";
+    
     Logger logger;
 
     @Override
